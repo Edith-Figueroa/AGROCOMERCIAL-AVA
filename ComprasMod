@@ -1,0 +1,36 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+
+Module ComprasMod
+
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+
+    Sub CompraPK(ByVal Id As String)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Compras where Nombre_Producto = '" & Id & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Ya existe un Producto con este nombre")
+        Else
+        End If
+    End Sub
+
+    Sub ValNomProducto(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        '1. Permite tanto letras como números, 2.Permite espacios en blanco, 3. Permite borrar
+        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsWhiteSpace(e.KeyChar) Or Char.IsControl(e.KeyChar) Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Lo sentimos solo puedes agregar letras(a-z) y números(0-9).", MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+End Module
