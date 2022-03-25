@@ -1,0 +1,60 @@
+
+Imports System.Data.SqlClient
+Public Class Inf_Inventario
+    Public conexion As SqlConnection
+    Sub Limpiarcampos()
+        Txt_CodProducto.Clear()
+        Txt_CodProducto.Clear()
+        Txt_CodProducto.Select()
+    End Sub
+
+
+    Private Sub Almacen_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+
+        Limpiarcampos()
+    End Sub
+
+
+
+    'BOTON BUSCAR
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+        If Txt_CodProducto.Text.Length = 0 Then
+            MsgBox("Ingrese el Codigo del Producto")
+        Else
+            If IsNumeric(Txt_CodProducto.Text) Then
+
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        Me.InventarioTableAdapter.Buscar_Almacen(Me.Agrocomercial_AVADataSet.Inventario, Txt_CodProducto.Text)
+                    Else
+                        MsgBox("El codigo del producto no existe")
+                        Txt_CodProducto.Clear()
+                    End If
+                Catch ex As Exception
+
+                End Try
+
+            End If
+        End If
+    End Sub
+
+    Private Sub Btn_MostrarTodo_Click(sender As Object, e As EventArgs) Handles Btn_MostrarTodo.Click
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        Limpiarcampos()
+    End Sub
+
+    Private Sub Txt_CodProducto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_CodProducto.KeyPress
+        SoloNumeros(e)
+    End Sub
+End Class
