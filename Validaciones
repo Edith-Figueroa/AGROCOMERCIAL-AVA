@@ -1,0 +1,74 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Module Validaciones
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+
+    Function ConsultarTipoUsuario(ByVal nombreUsuario As String) As Integer
+
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        Dim resultado As Integer
+        Try
+            enunciado = New SqlCommand("Select * from Empleados where Usuario='" & nombreUsuario & "'", conexion)
+            respuesta = enunciado.ExecuteReader
+
+            If respuesta.Read Then
+                resultado = CInt(respuesta.Item("Id_Cargo"))
+            End If
+            respuesta.Close()
+        Catch ex As Exception
+            MsgBox(ex.ToString)
+        End Try
+        Return resultado
+    End Function
+
+
+    'Deshabilitamos Los botones(Pantallas) con los cuales el jefe de inventario no puede tene interación
+    Function JefeInventario()
+        Menú.Btn_Proveedores.Visible = False
+        Menú.Btn_Empleados.Visible = False
+        Menú.Inf_Efectivo.Visible = False
+        Menú.Show()
+    End Function
+
+    'Funcion para que solo permite el ingreso de caracteres tipo numerico
+    Sub SoloNumeros(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Solo se puede ingresar valores de tipo número", MsgBoxStyle.Exclamation, "Ingreso de Número")
+        End If
+    End Sub
+
+
+    'Funcion para que solo permite el ingreso de caracteres tipo cadena de caracteres
+    Sub SoloLetras(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsDigit(e.KeyChar) Then
+            e.Handled = True
+            MsgBox("Solo se puede ingresar valores de tipo texto", MsgBoxStyle.Exclamation, "Ingreso de Texto")
+        ElseIf Char.IsControl(e.KeyChar) Then
+            e.Handled = False
+        Else
+            e.Handled = False
+        End If
+    End Sub
+
+    'Inhabilitar los combobox para que no permita agregar texto
+    Sub InhCombobox(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsDigit(e.KeyChar) Then
+            e.Handled = True
+            MsgBox("solo se aceptan opciones dentro de la lista")
+        ElseIf Char.IsControl(e.KeyChar) Then
+            e.Handled = True
+            MsgBox("solo se aceptan opciones dentro de la lista")
+        Else
+            e.Handled = True
+            MsgBox("solo se aceptan opciones dentro de la lista")
+        End If
+    End Sub
+
+End Module
