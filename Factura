@@ -1,0 +1,7 @@
+Public Class Factura
+    Private Sub Factura_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.generar_comprobante' Puede moverla o quitarla según sea necesario.
+        Me.generar_comprobanteTableAdapter.Fill(Me.Agrocomercial_AVADataSet.generar_comprobante, Id_Fatura:=IdFactura.Text)
+        Me.ReportViewer1.RefreshReport()
+    End Sub
+End Class
