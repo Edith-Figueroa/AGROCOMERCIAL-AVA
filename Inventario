@@ -1,0 +1,178 @@
+Imports System.Data.SqlClient
+Public Class Inventario
+    Public conexion As SqlConnection
+    Sub LimpiarCampos()
+        Txt_CodProducto.Text = ""
+        Numero_CompraComboBox.Text = ""
+        Txt_CantidadProducto.Text = ""
+        Txt_Precio_Compra.Text = ""
+        Txt_Precio_Venta.Text = ""
+        Txt_CodProducto.Select()
+    End Sub
+
+    Private Sub Inventario_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
+        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+
+        LimpiarCampos()
+    End Sub
+
+
+    Private Sub Btn_Agregar_Click(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
+
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Inventario where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        Dim comando2 As String = "Select * from Inventario where Numero_Compra = '" & Numero_CompraComboBox.Text & "'"
+        Dim da2 As New SqlDataAdapter
+        Dim dt2 As New DataTable
+        da2 = New SqlDataAdapter(comando2, conexion)
+        da2.Fill(dt2)
+
+
+        Dim Compra As Double = Txt_Precio_Compra.Text
+        Txt_Precio_Venta.Text = FormatNumber((Compra * 0.15 + Compra), 2)
+
+        If Txt_CodProducto.Text = "" Or Numero_CompraComboBox.Text = "" Or Txt_CantidadProducto.Text = "" Or Txt_Precio_Venta.Text = "" Or Txt_Precio_Compra.Text = "" Then
+            MsgBox("Algunos campos estan vacios, Por favor ingrese la información solicitada", MsgBoxStyle.Critical, "Error")
+        Else
+            If dt.Rows.Count <> 0 Then
+                MsgBox("Ya existe un Producto con este codigo")
+            ElseIf dt2.Rows.Count <> 0 Then
+                MsgBox("Esta compra ya está registrada, por favor elija otra")
+            Else
+                InventarioTableAdapter.Insertar_Almacen(Txt_CodProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text)
+                InventarioTableAdapter.Fill(Agrocomercial_AVADataSet.Inventario)
+                MsgBox("Se ha Agregado el producto correctamente", vbInformation, "Correcto")
+            End If
+
+        End If
+    End Sub
+
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, Conexion)
+        da.Fill(dt)
+
+        If Txt_CodProducto.Text.Length = 0 Then
+            MsgBox("Ingrese el codigo del producto a buscar")
+        Else
+            If IsNumeric(Txt_CodProducto.Text) Then
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        Me.InventarioTableAdapter.Buscar_Almacen(Me.Agrocomercial_AVADataSet.Inventario, Txt_CodProducto.Text)
+                    Else
+                        MsgBox("El codigo de producto ingresado no existe")
+                        LimpiarCampos()
+                    End If
+                Catch ex As Exception
+                End Try
+            End If
+        End If
+    End Sub
+
+    Private Sub Btn_Actualizar_Click(sender As Object, e As EventArgs) Handles Btn_Actualizar.Click
+
+
+
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If Txt_CodProducto.Text.Length = 0 Then
+            MsgBox("Ingrese el codigo del producto a Actualizar")
+        Else
+            If IsNumeric(Txt_CodProducto.Text) Then
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        MsgBox("Su actualización se ha realizado correctamente")
+                        Me.InventarioTableAdapter.Actualizar_Almacen(Txt_CodProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text, Txt_CodProducto.Text)
+                        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+                        LimpiarCampos()
+                    Else
+                        MsgBox("El codigo de producto ingresado no existe")
+                        LimpiarCampos()
+                    End If
+                Catch ex As Exception
+                End Try
+            End If
+        End If
+    End Sub
+
+    Private Sub Btn_Borrar_Click(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
+        Me.InventarioTableAdapter.Borrar_Almacen(Txt_CodProducto.Text)
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        MsgBox("Su Eliminación se ha realizado correctamente")
+        LimpiarCampos()
+
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If Txt_CodProducto.Text.Length = 0 Then
+            MsgBox("Ingrese el codigo del producto a borrar")
+        Else
+            If IsNumeric(Txt_CodProducto.Text) Then
+                Try
+                    If dt.Rows.Count <> 0 Then
+
+                    Else
+                        MsgBox("El codigo de producto ingresado no existe")
+                        LimpiarCampos()
+                    End If
+                Catch ex As Exception
+                End Try
+            End If
+        End If
+
+    End Sub
+
+
+
+    Private Sub Txt_CodProducto_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Txt_CodProducto.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Numero_CompraComboBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Numero_CompraComboBox.KeyPress
+        InhCombobox(e)
+    End Sub
+
+    Private Sub Btn_Mostrar_Click(sender As Object, e As EventArgs) Handles Btn_Mostrar.Click
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+    End Sub
+
+    Private Sub InventarioDataGridView_Click(sender As Object, e As EventArgs) Handles InventarioDataGridView.Click
+        'Pasar del datagridview a los textbox
+        Txt_CodProducto.Text = InventarioDataGridView.CurrentRow.Cells.Item(0).Value.ToString
+        Numero_CompraComboBox.Text = InventarioDataGridView.CurrentRow.Cells.Item(1).Value.ToString
+        Txt_Precio_Venta.Text = InventarioDataGridView.CurrentRow.Cells.Item(2).Value.ToString
+        Txt_CantidadProducto.Text = InventarioDataGridView.CurrentRow.Cells.Item(3).Value.ToString
+    End Sub
+
+
+
+    Private Sub Btn_Limpiar_Click(sender As Object, e As EventArgs) Handles Btn_Limpiar.Click
+        LimpiarCampos()
+    End Sub
+
+End Class
