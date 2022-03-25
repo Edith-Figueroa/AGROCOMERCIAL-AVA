@@ -1,0 +1,106 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Module ProveedoresMod
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+
+    Function Telefono(ByVal tel As TextBox)
+        If tel.Text = "3" Then
+        Else
+            MsgBox("ERROR")
+        End If
+    End Function
+    Sub ProveedoresPK(ByVal Id As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Proveedores where Id_Proveedor = '" & Id.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este Id ya se encuentra registrado")
+            Id.Clear()
+            Id.Focus()
+        End If
+    End Sub
+
+    Sub NombreProveedores(ByVal Nom As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Proveedores where Nombre_Proveedor = '" & Nom.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Ya existe un empleado registrado con ese nombre")
+            Nom.Clear() 'Se limpia el textbox
+            Nom.Focus()
+        End If
+    End Sub
+    Public Sub CorreoProveedores(ByVal correo As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Proveedores where Correo_Proveedor = '" & correo.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este correo ya está en uso,elige otro.")
+            correo.Clear() 'Se limpia el textbox
+            correo.Focus()
+        End If
+    End Sub
+
+    Sub TelefonoProveedores(ByVal Num As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Proveedores where Telefono_Proveedor = '" & Num.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este número de Teléfono ya se encuentra registrado")
+            Num.Clear() 'Se limpia el textbox
+            Num.Focus()
+        End If
+    End Sub
+
+    'Sub Telefono(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+
+    '    If Char.IsControl(e.KeyChar) Or e.f = "2" Or e.KeyChar = "3" Then
+    '        e.Handled = False
+    '    Else
+    '        e.Handled = True
+    '        MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y comas(,).", MsgBoxStyle.Exclamation, "Error")
+    '    End If
+    'End Sub
+
+    Sub ValNombreEmpresa(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Lo sentimos solo puedes agregar letras(a-z), numeros(0-9), puntos(.) y guiones(-_).", MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+
+
+
+End Module
