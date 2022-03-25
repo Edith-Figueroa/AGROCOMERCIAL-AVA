@@ -1,0 +1,139 @@
+Imports System.Data.SqlClient 'importamos librerias para que nos permita trabajar en la base'
+Public Class Login
+    Private Sub EmpleadosBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs)
+        Me.Validate()
+        Me.EmpleadosBindingSource.EndEdit()
+        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Esta parte de codigo es pare rectificar que tenemos la base de datos conectada con nuestros programa mientras trabajamos'
+        AbrirConexión()
+
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+
+    End Sub
+
+
+    Private Sub Txt_Usuario_Enter(sender As Object, e As EventArgs) Handles Txt_Usuario.Enter
+        'Evento para que cuando se toque el textboxt se vacie '
+        If (Txt_Usuario.Text = "USUARIO") Then        'si el TXT Esta con la etiqueta usuario'
+            Txt_Usuario.Text = ""                     'Al darle click se vaciara para agregar datos'    
+            Txt_Usuario.ForeColor = Color.White   'Cambiara el color para que resalte y se diferencee entre la etiqueta y lo que ingresemos en el txt'
+        End If
+    End Sub
+
+    Private Sub Txt_Usuario_Leave(sender As Object, e As EventArgs) Handles Txt_Usuario.Leave
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "USUARIO"'
+        If (Txt_Usuario.Text = "") Then                   'Si el TXT esta Vacio'
+            Txt_Usuario.Text = "USUARIO"                  'Se agregara nuevamente la etiqueta usuario'
+            Txt_Usuario.ForeColor = Color.LightGray       'Le agregamos el color que tenemos en el form para la etiqueta'
+        End If
+    End Sub
+
+    Private Sub Txt_Contraseña_Enter(sender As Object, e As EventArgs) Handles Txt_Contraseña.Enter
+        'Evento para que cuando se toque el textboxt se vacie '
+        If (Txt_Contraseña.Text = "CONTRASEÑA") Then        'si el TXT Esta con la etiqueta contraseña'
+            Txt_Contraseña.Text = ""                        'Al darle click se vaciara para agregar datos'    
+            Txt_Contraseña.ForeColor = Color.White          'Cambiara el color para que resalte y se diferencee entre la etiqueta y lo que ingresemos en el txt'
+            Txt_Contraseña.UseSystemPasswordChar = True     'Contraseña se ocultara
+        End If
+    End Sub
+
+    Private Sub Txt_Contraseña_Leave(sender As Object, e As EventArgs) Handles Txt_Contraseña.Leave
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "CONTRASEÑA"'
+        If (Txt_Contraseña.Text = "") Then                   'Si el TXT esta Vacio'
+            Txt_Contraseña.Text = "CONTRASEÑA"               'Se agregara nuevamente la etiqueta contaseña'
+            Txt_Contraseña.ForeColor = Color.LightGray       'Le agregamos el color que tenemos en el form para la etiqueta'
+            Txt_Contraseña.UseSystemPasswordChar = False     'Sistema de contraseña oculta se deshabilita'
+        End If
+    End Sub
+
+    Private Sub Check_MostrarContraseña_CheckedChanged(sender As Object, e As EventArgs) Handles Check_MostrarContraseña.CheckedChanged
+        If Check_MostrarContraseña.Checked = True Then
+            Txt_Contraseña.UseSystemPasswordChar = False
+        Else
+            Txt_Contraseña.UseSystemPasswordChar = True
+
+        End If
+    End Sub
+
+    Private Sub Btn_Minimizar_Click(sender As Object, e As EventArgs) Handles Btn_Minimizar.Click
+        'Minimizamos la aplicación'
+        Me.WindowState = FormWindowState.Minimized
+    End Sub
+
+    Private Sub Btn_Cerrar_Click(sender As Object, e As EventArgs) Handles Btn_Cerrar.Click
+        'Cerramos completamente la aplicación'
+        Application.Exit()
+    End Sub
+
+    Private Sub Llbl_Recuperación_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Llbl_Recuperación.LinkClicked
+        Me.Hide()
+        Recuperación.Show()
+    End Sub
+
+    Private Sub msjerror(mjs As String)
+        'Metodo para mostrar el mensaje de error'
+        Lbl_MsjError.Text = "       " + mjs
+        Lbl_MsjError.Visible = True
+    End Sub
+
+
+    Private Sub Btn_Acceder_Click(sender As Object, e As EventArgs) Handles Btn_Acceder.Click
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim conexion As String = "Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True"
+        Dim comando As String = "select * from Empleados where Usuario = '" & Txt_Usuario.Text & "'and Contraseña = '" & Txt_Contraseña.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+
+
+
+        'If Txt_Usuario.Text <> "USUARIO" Then
+        '    If Txt_Contraseña.Text = "CONTRASEÑA" Then
+        '        msjerror("POR FAVOR INGRESE SU CONTRASEÑA")
+        '    Else
+        '        'Try Catch permite que si existe un Error nos muestre cual es'
+        '        Try
+        '            da = New SqlDataAdapter(comando, conexion)
+        '            da.Fill(dt)
+
+        '            'Validar Usuario y contraseña para acceder al sistema'
+        '            If dt.Rows.Count <> 0 Then
+
+        '                ' Tipo de Empleados'
+        '                If ConsultarTipoUsuario(Txt_Usuario.Text) = 1 Then
+        '                    Menú.Show()
+        '                ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 2 Then
+        '                    JefeInventario()
+        '                ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 3 Then
+        '                    Ventas.Show()
+        '                End If
+
+
+
+        '            Else
+        '                MsgBox("USUARIO O CONTRASEÑA INCORRECTOS")
+        '                Txt_Contraseña.Text = "CONTRASEÑA"
+        '                Txt_Usuario.Text = "USUARIO"
+        '                Check_MostrarContraseña.Checked = False
+        '                Txt_Contraseña.UseSystemPasswordChar = False
+
+        '            End If
+        '        Catch ex As Exception
+        '            MsgBox(ex.Message)
+        '        End Try
+        '    End If
+        'Else
+        '    msjerror("POR FAVOR INGRESE UN NOMBRE DE USUARIO")
+        'End If
+
+        Menú.Show()
+
+
+    End Sub
+
+End Class
