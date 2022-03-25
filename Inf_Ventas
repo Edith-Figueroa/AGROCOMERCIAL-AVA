@@ -1,0 +1,99 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+
+Public Class Inf_Ventas
+    Public conexion As SqlConnection
+
+    Sub Limpiarcampo()
+        Txt_IdFactura.Text = ""
+        Txt_IdFactura.Select()
+    End Sub
+
+    Private Sub Inf_Ventas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Ventas' Puede moverla o quitarla según sea necesario.
+        Me.VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Ventas)
+    End Sub
+
+    'Boton Buscar
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Ventas Where Id_Factura = '" & Txt_IdFactura.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+        If Txt_IdFactura.Text.Length = 0 Then
+            MsgBox("Por favor ingrese el id de la venta a buscar")
+        Else
+            If IsNumeric(Txt_IdFactura.Text) Then
+
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        Me.VentasTableAdapter.Buscar_Venta(Me.Agrocomercial_AVADataSet.Ventas, Txt_IdFactura.Text)
+                    Else
+                        MsgBox("Esa venta no existe")
+                        Limpiarcampo()
+                    End If
+                Catch ex As Exception
+
+                End Try
+
+            End If
+        End If
+    End Sub
+
+    'Boton Mostrar Todo
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Btn_MostrarTodo.Click
+        Me.VentasBindingSource.Filter = True
+        Me.VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Ventas)
+        Limpiarcampo()
+    End Sub
+
+    Private Sub Txt_IdFactura_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_IdFactura.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub DTP_FECHA_ValueChanged(sender As Object, e As EventArgs) Handles DTP_FECHA.ValueChanged
+
+        ' Fecha del control DateTimePicker
+        Dim fecha As String = String.Format("{0:#MM\/dd\/yyyy#}", DTP_FECHA.Value)
+
+        ' Establecemos el filtro
+        Me.VentasBindingSource.Filter = "Fecha_Emision= " & fecha
+    End Sub
+
+    Private Sub VentasDataGridView_Click(sender As Object, e As EventArgs) Handles VentasDataGridView.Click
+        'Pasa los datos del datagridview a los textbox'
+        Txt_IdFactura.Text = VentasDataGridView.CurrentRow.Cells.Item(0).Value.ToString
+    End Sub
+
+    Private Sub Btn_MostrarInf_Click(sender As Object, e As EventArgs) Handles Btn_MostrarInf.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Ventas Where Id_Factura = '" & Txt_IdFactura.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+        If Txt_IdFactura.Text.Length = 0 Then
+            MsgBox("Selecione la venta a mostrar")
+        Else
+            If IsNumeric(Txt_IdFactura.Text) Then
+
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        Factura.IdFactura.Text = Me.Txt_IdFactura.Text
+                        Factura.Show()
+                        Limpiarcampo()
+                    Else
+                        MsgBox("Esa venta no existe")
+                        Limpiarcampo()
+                    End If
+                Catch ex As Exception
+
+                End Try
+            End If
+        End If
+    End Sub
+End Class
