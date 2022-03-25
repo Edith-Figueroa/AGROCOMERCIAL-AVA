@@ -1,0 +1,176 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Public Class Compras
+    Public conexion As SqlConnection
+    Sub limpiarCampos()
+        Txt_Producto.Clear()
+        Txt_Precio.Clear()
+        ND_Cantidad.Value = 0
+        Txt_IdProveedor.Text = ""
+        Txt_Producto.Select()
+    End Sub
+
+    Private Sub Btn_Agregar_Click(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
+
+        If (Txt_Producto.Text = "") Or (Txt_Precio.Text = "") Or (ND_Cantidad.Value = 0) Or (Txt_IdProveedor.Text = "") Then
+            MsgBox("Porfavor ingrese todos los datos")
+        Else
+            Me.ComprasTableAdapter.Insertar_Compra(Txt_Producto.Text, Txt_Precio.Text, ND_Cantidad.Value, Txt_IdProveedor.Text, Dtp_Fecha.Value, Dt_Hora.Value.ToShortTimeString)
+            Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+
+            Txt_Producto.Text = ""
+            Txt_Precio.Text = ""
+            ND_Cantidad.Value = ND_Cantidad.Minimum
+            MsgBox("Se ha Agregado la compra", vbInformation, "Correcto")
+            limpiarCampos()
+        End If
+    End Sub
+
+    Private Sub Productos_Load_1(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Proveedores' Puede moverla o quitarla según sea necesario.
+        Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Ventas' Puede moverla o quitarla según sea necesario.
+        Me.VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Ventas)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
+        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+
+        limpiarCampos()
+    End Sub
+
+    Private Sub Btn_Actualizar_Click(sender As Object, e As EventArgs) Handles Btn_Actualizar.Click
+        Dim S As String
+        Dim Num As Integer
+        S = InputBox("Ingrese el numero de la compra", "Compras", 0)
+
+        If S = "" Then
+            MsgBox("Canceló")
+            Exit Sub
+        End If
+
+        Num = CDbl(S)
+        If Num >= 0 Then
+            Me.ComprasTableAdapter.Actualizar_Compra(Txt_Producto.Text, Txt_Precio.Text, ND_Cantidad.Value, Txt_IdProveedor.Text, Num)
+            Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+            MsgBox("se actualizo toda la informacion de la ", vbInformation, "Correcto")
+            limpiarCampos()
+        End If
+    End Sub
+
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        Dim S As String
+        Dim Num As Integer
+        S = InputBox("Ingrese el numero de la compra", "Compras", 0)
+
+        If S = "" Then
+            MsgBox("Canceló")
+            Exit Sub
+        End If
+
+        Num = CDbl(S)
+        If Num >= 0 Then
+            Me.ComprasTableAdapter.Buscar_Compra(Me.Agrocomercial_AVADataSet.Compras, Num)
+        End If
+    End Sub
+
+    'Boton Borrar
+    Private Sub Btn_Borrar_Click(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
+        Dim S As String 'Variable para inputbox
+        Dim Num As Integer 'Variable Interger para asignar cuando convirtamos S
+        S = InputBox("Ingrese el numero de la compra", "Compras", 0)
+
+        'Sentencia para que nos permita salir del imputbox
+        If S = "" Then
+            Exit Sub
+        End If
+
+        If IsNumeric(S) Then 'Validando que el inputbox solo acepte letras
+
+            Num = CDbl(S) 'Convertimos S a double y se lo asignamos a la variable Num
+            Dim conexion As String = "Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True" 'Conectandono con la base de datos
+            Dim comando As String = "select * from Inventario Where Numero_Compra=" & S 'Comparando el número de compra de la tabla inventario con el dato ingresado al inputbox
+            Dim DAI
+            Dim DTI As New DataTable
+
+            Dim comand As String = "select * from Compras Where Numero_Compra= " & S 'Comparando el número de compra de la tabla compras con el dato ingresado al inputbox
+            Dim da
+            Dim dt As New DataTable
+
+            If Num > 0 Then 'Validación que no acepte numeros negativos nuestro inputbox
+
+                'El try catch nos permite facilitar encontrar errores en nuestro codigo
+                Try
+                    DAI = New SqlDataAdapter(comando, conexion)
+                    DAI.Fill(DTI)
+                    da = New SqlDataAdapter(comand, conexion)
+                    da.Fill(dt)
+
+                    'Comprobamos si el numero de compra ya está registrado en el inventario nos de un error y no nos permita borrar la compra
+                    If DTI.Rows.Count <> 0 Then
+                        MsgBox("Esta compra no se puede eliminar porque ya se encuentra en el inventario.")
+                    ElseIf dt.Rows.Count <> 0 And Not DTI.Rows.Count <> 0 Then 'En dado caso que exista en compras y no existe en inventario nos permitirá borrar la compra
+                        Me.ComprasTableAdapter.Borrar_Compra(Num)
+                        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+                        MsgBox("La compra se ha borrado con exito")
+                    Else
+                        MsgBox("El número de compra no existe") 'Y si el número de compra no existe ni en inventario, ni en la tabla compras nos muestra un mensaje que no existe dicho número
+                    End If
+                Catch ex As Exception
+                    MsgBox(ex.ToString)
+                End Try
+
+            Else
+                MsgBox("No se aceptan números negativos")
+            End If
+
+        Else
+            MsgBox("No se acepta este tipo de caracter")
+        End If
+    End Sub
+
+
+
+    Private Sub Compras_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        limpiarCampos()
+    End Sub
+
+
+    Private Sub Txt_Precio_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Precio.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub ND_Cantidad_KeyPress(sender As Object, e As KeyPressEventArgs) Handles ND_Cantidad.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Txt_IdProveedor_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_IdProveedor.KeyPress
+        InhCombobox(e)
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Btn_Mostrar.Click
+        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+
+    End Sub
+
+    Private Sub ComprasDataGridView_Click(sender As Object, e As EventArgs) Handles ComprasDataGridView.Click
+        'Agregar datos del datagridview a los textbox
+        Txt_Producto.Text = ComprasDataGridView.CurrentRow.Cells.Item(1).Value.ToString
+        Txt_Precio.Text = ComprasDataGridView.CurrentRow.Cells.Item(2).Value.ToString
+        ND_Cantidad.Value = ComprasDataGridView.CurrentRow.Cells.Item(3).Value.ToString
+        Txt_IdProveedor.Text = ComprasDataGridView.CurrentRow.Cells.Item(4).Value.ToString
+        Dtp_Fecha.Value = ComprasDataGridView.CurrentRow.Cells.Item(5).Value.ToString
+        Dt_Hora.Value = Convert.ToDateTime(ComprasDataGridView.CurrentRow.Cells.Item(6).Value.ToString)
+    End Sub
+
+    Private Sub Txt_Producto_Leave(sender As Object, e As EventArgs) Handles Txt_Producto.Leave
+        CompraPK(Txt_Producto.Text)
+    End Sub
+
+    Private Sub Btn_Limpiar_Click(sender As Object, e As EventArgs) Handles Btn_Limpiar.Click
+        limpiarCampos()
+    End Sub
+
+    Private Sub Txt_Producto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Producto.KeyPress
+        ValNomProducto(e)
+    End Sub
+End Class
