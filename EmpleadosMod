@@ -1,0 +1,137 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Module EmpleadosMod
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+
+    'No permite repetir el Id del empleado.
+    Sub EmpleadosPK(ByVal Id As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox.
+        Dim comando As String = "Select * from Empleados where Id_Empleado = '" & Id.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este Id ya se encuentra registrado")
+        End If
+    End Sub
+
+
+    'No permite repetir el Nombre del empleado.
+    Sub NombreEmpleados(ByVal Nombre As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox.
+        Dim comando As String = "Select * from Empleados where Nombre_Empleado = '" & Nombre.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Ya existe un empleado registrado con ese nombre")
+            Nombre.Clear()
+            Nombre.Focus()
+        End If
+    End Sub
+
+
+    'No permite repetir el Teléfono del empleado.
+    Sub TelefonoEmpleados(ByVal Num As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox.
+        Dim comando As String = "Select * from Empleados where Telefono = '" & Num.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este número de Teléfono ya se encuentra registrado")
+            Num.Clear() 'Limpiar el textbox
+            Num.Focus() 'Permite que el cursor se situe en el textbox
+        End If
+    End Sub
+
+
+
+    'No permite repetir el Correo del empleado.
+    Sub CorreoEmpleados(ByVal correo As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox.
+        Dim comando As String = "Select * from Empleados where Correo_Empleado = '" & correo.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este correo ya está en uso,elige otro.")
+            correo.Clear()
+            correo.Focus()
+        End If
+    End Sub
+
+
+    'No permite repetir el Nombre de usuario del empleado.
+    Sub UsuarioEmpleados(ByVal Usuario As TextBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox'
+        Dim comando As String = "Select * from Empleados where Usuario = '" & Usuario.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+            MsgBox("Este Usuario ya se encuentra registrado")
+            Usuario.Clear()
+            Usuario.Focus()
+        End If
+    End Sub
+
+
+    'Nos permite validar que tipo de datos permitirá La dirección.
+    Sub ValDireccion(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or Char.IsWhiteSpace(e.KeyChar) Or e.KeyChar = "," Or e.KeyChar = "." Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y comas(,).", MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+
+    'Sirve para el campo dirección tanto de empleados como proveedores...Nos permite validar que tipo de datos permitirá el Correo.
+    Sub ValCorreo(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Or e.KeyChar = "@" Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), arroba(@), puntos(.) y guiones(- _).", MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+
+    'Nos permite validar que tipo de datos se pueden ingresar en el Nombre de usuario. 
+    Sub ValUsuario(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsLetterOrDigit(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y guiones(- _).", MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+
+End Module
