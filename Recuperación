@@ -1,0 +1,156 @@
+Imports System.Data.SqlClient
+Public Class Recuperación
+    Private Sub Check_MostrarContraseña_CheckedChanged(sender As Object, e As EventArgs) Handles Check_MostrarContraseña.CheckedChanged
+        If Check_MostrarContraseña.Checked = True Then
+            Txt_NContraseña.UseSystemPasswordChar = False
+            Txt_CNContraseña.UseSystemPasswordChar = False
+        Else
+            Txt_NContraseña.UseSystemPasswordChar = True
+            Txt_CNContraseña.UseSystemPasswordChar = True
+        End If
+    End Sub
+
+    Private Sub Btn_Regresar_Click(sender As Object, e As EventArgs) Handles Btn_Regresar.Click
+        Login.Show()
+        Me.Close()
+    End Sub
+
+    Private Sub Txt_Usuario_Enter(sender As Object, e As EventArgs) Handles Txt_Usuario.Enter
+        'Evento para que cuando se toque el textboxt se vacie '
+        If (Txt_Usuario.Text = "USUARIO") Then        'si el TXT Esta con la etiqueta usuario'
+            Txt_Usuario.Text = ""                     'Al darle click se vaciara para agregar datos'    
+            Txt_Usuario.ForeColor = Color.White   'Cambiara el color para que resalte y se diferencee entre la etiqueta y lo que ingresemos en el txt'
+        End If
+    End Sub
+
+    Private Sub Txt_Usuario_Leave(sender As Object, e As EventArgs) Handles Txt_Usuario.Leave
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "USUARIO"'
+        If (Txt_Usuario.Text = "") Then                   'Si el TXT esta Vacio'
+            Txt_Usuario.Text = "USUARIO"                  'Se agregara nuevamente la etiqueta usuario'
+            Txt_Usuario.ForeColor = Color.LightGray       'Le agregamos el color que tenemos en el form para la etiqueta'
+        End If
+    End Sub
+
+    Private Sub Txt_NContraseña_Enter(sender As Object, e As EventArgs) Handles Txt_NContraseña.Enter
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "NUEVA CONTRASEÑA"'
+        If (Txt_NContraseña.Text = "NUEVA CONTRASEÑA") Then    'si el TXT Esta con la etiqueta NUEVA CONTRASEÑA'
+            Txt_NContraseña.Text = ""                          'Al darle click se vaciara para agregar datos'
+            Txt_NContraseña.ForeColor = Color.White        'Cambiara el color para que resalte y se diferencee entre la etiqueta y lo que ingresemos en el txt'
+            Txt_NContraseña.UseSystemPasswordChar = True       'Se ocultara la contraseña'
+        End If
+    End Sub
+
+    Private Sub Txt_NContraseña_Leave(sender As Object, e As EventArgs) Handles Txt_NContraseña.Leave
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "USUARIO"'
+        If (Txt_NContraseña.Text = "") Then                   'Si el TXT esta Vacio'
+            Txt_NContraseña.Text = "NUEVA CONTRASEÑA"         'Se agregara nuevamente la etiqueta usuario'
+            Txt_NContraseña.ForeColor = Color.LightGray       'Le agregamos el color que tenemos en el form para la etiqueta'
+            Txt_NContraseña.UseSystemPasswordChar = False     'Se muestra el texto'
+        End If
+    End Sub
+
+    Private Sub Txt_CNContraseña_Enter(sender As Object, e As EventArgs) Handles Txt_CNContraseña.Enter
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "CONFIRMAR NUEVA CONTRASEÑA"'
+        If (Txt_CNContraseña.Text = "CONFIRMAR NUEVA CONTRASEÑA") Then    'si el TXT Esta con la etiqueta CONFIRMAR NUEVA CONTRASEÑA'
+            Txt_CNContraseña.Text = ""                                    'Al darle click se vaciara para agregar datos'
+            Txt_CNContraseña.ForeColor = Color.White                 'Cambiara el color para que resalte y se diferencee entre la etiqueta y lo que ingresemos en el txt'
+            Txt_CNContraseña.UseSystemPasswordChar = True                 'Se ocultara la contraseña'
+        End If
+    End Sub
+
+    Private Sub Txt_CNContraseña_Leave(sender As Object, e As EventArgs) Handles Txt_CNContraseña.Leave
+        'Evento para cuando el  cursos sale del txt o el txt este vacio se agregue la etiqueta de "CONFIRMAR NUEVA CONTRASEÑA"'
+        If (Txt_CNContraseña.Text = "") Then                         'Si el TXT esta Vacio'
+            Txt_CNContraseña.Text = "CONFIRMAR NUEVA CONTRASEÑA"     'Se agregara nuevamente la etiqueta CONFIRMAR NUEVA CONTRASEÑA'
+            Txt_CNContraseña.ForeColor = Color.LightGray             'Le agregamos el color que tenemos en el form para la etiqueta'
+            Txt_CNContraseña.UseSystemPasswordChar = False           'Se muestra el texto'
+        End If
+    End Sub
+
+    Private Sub msjerror(mjs As String)
+        Lbl_MsjError.Text = "       " + mjs
+        Lbl_MsjError.Visible = True
+    End Sub
+
+    Private Sub Btn_Aceptar_Click(sender As Object, e As EventArgs) Handles Btn_Aceptar.Click
+        'Asignamos los valores de la base de datos al textbox'
+        Dim conexion As String = "Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True"
+        Dim comando As String = "select  * from Empleados where Usuario = '" & Txt_Usuario.Text & "'"
+        Dim da As SqlDataAdapter
+        Dim dt As New DataTable
+
+        If Txt_Usuario.Text <> "USUARIO" Then
+
+
+            Try
+                da = New SqlDataAdapter(comando, conexion)
+                da.Fill(dt)
+
+                If dt.Rows.Count <> 0 Then
+                    If Txt_NContraseña.Text = "NUEVA CONTRASEÑA" Then
+                        msjerror("POR FAVOR INGRESE UNA CONTRASEÑA")
+                    Else
+                        If Txt_CNContraseña.Text = "CONFIRMAR NUEVA CONTRASEÑA" Then
+                            msjerror("POR FAVOR CONFIRME SU CONTRASEÑA")
+                        Else
+                            If Txt_NContraseña.Text <> Txt_CNContraseña.Text Then
+                                msjerror("LAS CONTRASEÑAS NO COINCIDEN")
+
+                                'Colocar como por defecto los textbox y el checkbox'
+                                Txt_NContraseña.UseSystemPasswordChar = False
+                                Txt_CNContraseña.UseSystemPasswordChar = False
+                                Check_MostrarContraseña.Checked = False
+                                Txt_NContraseña.Text = "NUEVA CONTRASEÑA"
+                                Txt_CNContraseña.Text = "CONFIRMAR NUEVA CONTRASEÑA"
+                            Else
+                                MessageBox.Show("Su cambio de contraseña ha sido existoso", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                Me.EmpleadosTableAdapter.Actualizar_Contraseña(Txt_Usuario.Text, Txt_CNContraseña.Text, Txt_Usuario.Text)
+                                Login.Show()
+                                Me.Close()
+                            End If
+                        End If
+                    End If
+                Else
+                    MsgBox("EL USUARIO NO EXISTE")
+                End If
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+
+        Else
+            msjerror("INGRESE UN USUARIO")
+        End If
+
+    End Sub
+
+    Private Sub EmpleadosBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs)
+        Me.Validate()
+        Me.EmpleadosBindingSource.EndEdit()
+        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+
+    End Sub
+
+    Private Sub Recuperación_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+
+    End Sub
+
+    Private Sub EmpleadosBindingNavigatorSaveItem_Click_1(sender As Object, e As EventArgs)
+        Me.Validate()
+        Me.EmpleadosBindingSource.EndEdit()
+        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+
+    End Sub
+
+    Private Sub EmpleadosBindingNavigatorSaveItem_Click_2(sender As Object, e As EventArgs) 
+        Me.Validate()
+        Me.EmpleadosBindingSource.EndEdit()
+        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+
+    End Sub
+End Class
