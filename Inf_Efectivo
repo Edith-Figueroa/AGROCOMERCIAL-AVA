@@ -1,0 +1,38 @@
+Public Class Inf_Efectivo
+    Private Sub VentasBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs)
+        Me.Validate()
+        Me.VentasBindingSource.EndEdit()
+        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+
+    End Sub
+
+    Private Sub Inf_Efectivo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Ventas' Puede moverla o quitarla según sea necesario.
+        Me.VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Ventas)
+
+    End Sub
+
+    Private Sub DateTimePicker1_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePicker1.ValueChanged
+
+        ' Fecha del control DateTimePicker
+        '
+        Dim fecha As String =
+            String.Format("{0:#MM\/dd\/yyyy#}", DateTimePicker1.Value)
+
+        ' Establecemos el filtro
+        Me.VentasBindingSource.Filter = "Fecha_Emision = " & fecha
+
+        'If VentasBindingSource.Filter.Count = 0 Then
+        '    ' Primero eliminamos el filtro
+        '    VentasBindingSource.Filter = String.Empty
+
+        '    ' Después mostramos el mensaje
+        '    MessageBox.Show("No existen registros.")
+
+        'End If
+    End Sub
+
+    Private Sub Btn_MostrarTodo_Click(sender As Object, e As EventArgs) Handles Btn_MostrarTodo.Click
+        Me.VentasBindingSource.Filter = True
+    End Sub
+End Class
