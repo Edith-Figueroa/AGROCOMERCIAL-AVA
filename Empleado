@@ -1,0 +1,222 @@
+Imports System
+Imports System.Text.RegularExpressions
+Imports System.Data.SqlClient
+Public Class Empleados
+    Public conexion As SqlConnection
+
+    Private Sub Empleados_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Cargo' Puede moverla o quitarla según sea necesario.
+        Me.CargoTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Cargo)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+
+        Limpiar_Campos()
+    End Sub
+
+    Sub Limpiar_Campos()
+        Txt_Id.Clear()
+        Txt_Nombre.Clear()
+        Cmb_Sexo.Text = ""
+        Txt_Telefono.Clear()
+        Txt_Correo.Clear()
+        Txt_Direccion.Clear()
+        CmbCargo.Text = ""
+        Txt_Usuario.Clear()
+        Txt_Contraseña.Clear()
+    End Sub
+
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
+        If Txt_Id.Text = "" Or Txt_Nombre.Text = "" Or Cmb_Sexo.Text = "" Or Txt_Telefono.Text = "" Or Txt_Correo.Text = "" Or Txt_Direccion.Text = "" Or CmbCargo.Text = "" Or Txt_Usuario.Text = "" Or Txt_Contraseña.Text = "" Then
+            MsgBox("por favor llene todos los campos")
+        Else
+            Me.EmpleadosTableAdapter.Insertar_Empleado(Txt_Id.Text, Txt_Nombre.Text, Cmb_Sexo.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Direccion.Text, DTP_FechaContra.Value, CmbCargo.Text, GroupBox.Text, Txt_Contraseña.Text)
+            Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+            MsgBox("Se ha agregado el empleado con exito", vbInformation, "Correcto")
+            Limpiar_Campos()
+        End If
+    End Sub
+
+    Private Sub Btn_Borrar_Click(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Empleados Where Id_Empleado = '" & Txt_Id.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If Txt_Id.TextLength = 0 Then
+            MsgBox("por favor llene el campo Id_Empleado")
+        Else
+            If dt.Rows.Count <> 0 Then
+                Me.EmpleadosTableAdapter.Borrar_Empleado(Txt_Id.Text)
+                Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+                MsgBox("Se ha eliminado el empleado con exito", vbInformation, "Correcto")
+                Limpiar_Campos()
+            Else
+                MsgBox("El Empleado no existe")
+
+            End If
+
+        End If
+
+
+    End Sub
+    Private Sub Btn_Actualizar_Click(sender As Object, e As EventArgs) Handles Btn_Actualizar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Empleados Where Id_Empleado = '" & Txt_Id.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If Txt_Id.Text = "" Or Txt_Nombre.Text = "" Or Cmb_Sexo.Text = "" Or Txt_Telefono.Text = "" Or Txt_Correo.Text = "" Or Txt_Direccion.Text = "" Or CmbCargo.Text = "" Or Txt_Usuario.Text = "" Or Txt_Contraseña.Text = "" Then
+            MsgBox("por favor llene todos los campos")
+        Else
+            If dt.Rows.Count <> 0 Then
+                Me.EmpleadosTableAdapter.Actualizar_Empleado(Txt_Id.Text, Txt_Nombre.Text, Cmb_Sexo.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Direccion.Text, DTP_FechaContra.Value, CmbCargo.Text, GroupBox.Text, Txt_Contraseña.Text, Txt_Id.Text)
+                Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+                MsgBox("Se ha actualizado el empleado con exito", vbInformation, "Correcto")
+                Limpiar_Campos()
+            Else
+                MsgBox("El Empleado no existe")
+
+            End If
+        End If
+    End Sub
+
+
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Empleados Where Id_Empleado = '" & Txt_Id.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+        If Txt_Id.Text.Length = 0 Then
+            MsgBox("Ingrese el Id del Empleado")
+
+        End If
+        If IsNumeric(Txt_Id.Text) Then
+
+            Try
+                If dt.Rows.Count <> 0 Then
+                    Me.EmpleadosTableAdapter.Buscar_Empleado(Me.Agrocomercial_AVADataSet.Empleados, Txt_Id.Text)
+                Else
+                    MsgBox("El Empleado no existe")
+                End If
+            Catch ex As Exception
+
+            End Try
+        End If
+    End Sub
+
+
+    Private Sub Txt_Id_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Id.KeyPress
+        SoloNumeros(e)
+
+        Txt_Id.MaxLength = 13
+        If Txt_Id.TextLength >= 13 Then
+            MsgBox("El id no puede contener mas de 13 digitos")
+        End If
+    End Sub
+
+    Private Sub Txt_Nombre_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Nombre.KeyPress
+        SoloLetras(e)
+    End Sub
+
+    Private Sub Txt_Telefono_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Telefono.KeyPress
+        SoloNumeros(e)
+        If Txt_Telefono.TextLength >= 8 Then
+            MsgBox("Limite de caracteres alcanzado")
+        End If
+    End Sub
+
+    Private Sub Btn_Mostrar_Click(sender As Object, e As EventArgs) Handles Btn_Mostrar.Click
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+    End Sub
+
+    Private Sub EmpleadosDataGridView_Click(sender As Object, e As EventArgs) Handles EmpleadosDataGridView.Click
+        'Pasa los datos del datagridview a los textbox'
+        Txt_Id.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(0).Value.ToString
+        Txt_Nombre.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(1).Value.ToString
+        Cmb_Sexo.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(2).Value.ToString
+        Txt_Telefono.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(3).Value.ToString
+        Txt_Correo.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(4).Value.ToString
+        Txt_Direccion.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(5).Value.ToString
+        DTP_FechaContra.Value = EmpleadosDataGridView.CurrentRow.Cells.Item(6).Value.ToString
+        CmbCargo.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(7).Value.ToString
+        Txt_Usuario.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(8).Value.ToString
+        Txt_Contraseña.Text = EmpleadosDataGridView.CurrentRow.Cells.Item(9).Value.ToString
+    End Sub
+
+    Private Sub Cmb_Sexo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Cmb_Sexo.KeyPress
+        InhCombobox(e)
+    End Sub
+
+    Private Sub CmbCargo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles CmbCargo.KeyPress
+        InhCombobox(e)
+    End Sub
+    Private Sub Txt_Direccion_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Direccion.KeyPress
+
+        Txt_Direccion.MaxLength = 100
+        If Txt_Direccion.TextLength >= 100 Then
+            MsgBox("Ha Alcanzado el limite de caracteres")
+            Txt_Direccion.Select()
+        Else
+            ValDireccion(e)
+        End If
+
+    End Sub
+
+    Private Sub Txt_Id_Leave(sender As Object, e As EventArgs) Handles Txt_Id.Leave
+        Txt_Direccion.MaxLength = 13
+        If Txt_Id.TextLength <> 13 Then
+            MsgBox("El id del Empleado debe contener 13 digitos")
+        Else
+            EmpleadosPK(Txt_Id)
+        End If
+    End Sub
+
+    Private Sub Txt_Nombre_Leave(sender As Object, e As EventArgs) Handles Txt_Nombre.Leave
+        NombreEmpleados(Txt_Nombre)
+    End Sub
+
+    Private Sub Txt_Telefono_Leave(sender As Object, e As EventArgs) Handles Txt_Telefono.Leave
+        Txt_Telefono.MaxLength = 8
+        If Txt_Telefono.TextLength <> 8 Then
+            MsgBox("El número de teléfono debe contener 8 digitos")
+        Else
+            TelefonoEmpleados(Txt_Telefono)
+        End If
+
+        If Txt_Telefono.Text <> "" Then
+            If Txt_Telefono.Text.FirstOrDefault() <> "2" And Txt_Telefono.Text.FirstOrDefault() <> "9" And Txt_Telefono.Text.FirstOrDefault() <> "3" And Txt_Telefono.Text.FirstOrDefault() <> "8" Then
+                MsgBox("El numero que ingreso no es valido en honduras, los numeros validos son: 2, 3, 8 y 9", vbExclamation)
+            End If
+        End If
+
+    End Sub
+    Private Sub Txt_Correo_Leave(sender As Object, e As EventArgs) Handles Txt_Correo.Leave
+        CorreoEmpleados(Txt_Correo)
+    End Sub
+    Private Sub Txt_Usuario_Leave(sender As Object, e As EventArgs) Handles Txt_Usuario.Leave
+        UsuarioEmpleados(Txt_Usuario)
+    End Sub
+    Private Sub Txt_Usuario_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Usuario.KeyPress
+        ValUsuario(e)
+    End Sub
+
+    Private Sub Btn_Limpiar_Click(sender As Object, e As EventArgs) Handles Btn_Limpiar.Click
+        Limpiar_Campos()
+    End Sub
+
+    Private Sub Txt_Correo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Correo.KeyPress
+        ValCorreo(e)
+    End Sub
+End Class
