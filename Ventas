@@ -1,0 +1,161 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Public Class Ventas
+    Sub Limpiar()
+        Id_FacturaComboBox.Text = ""
+        Txt_Id_Empleado.Text = ""
+        Txt_Codigo.Text = ""
+        Cmb_NombreProd.Text = ""
+        Txt_Precio.Text = ""
+        Cantidad_ND.Value = 0
+        'Txt_Cliente.Text=""
+    End Sub
+
+    Private Sub Btn_Aceptar_Click(sender As Object, e As EventArgs) Handles Btn_Aceptar.Click
+        'If Txt_Id_Empleado.Text = "" Or Cmb_CodigoProducto.Text = "" Or Cantidad_ND.Value = 0 Or Txt_Nombre.Text = "" Or Txt_Precio.Text = "" Then
+        '    MsgBox("Porfavor llene los espacios vacios", vbExclamation, "AVISO")
+        'Else
+        Factura.IdFactura.Text = Me.Id_FacturaComboBox.Text
+        Factura.Show()
+        ' End If
+
+        'DataGridView.Rows.Clear()
+
+    End Sub
+
+    Private Sub Ventas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Asegurarnos que el formulario comience limpio
+        Limpiar()
+        Id_FacturaComboBox.Text = ""
+        Txt_Id_Empleado.Text = ""
+        Txt_Codigo.Text = ""
+        Cmb_NombreProd.Text = ""
+        Txt_Precio.Text = ""
+        Cantidad_ND.Value = 0
+        'Txt_Cliente.Text=""
+
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Proced_Ventas' Puede moverla o quitarla según sea necesario.
+        Me.Proced_VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proced_Ventas)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
+        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Detalle_Venta' Puede moverla o quitarla según sea necesario.
+        Me.Detalle_VentaTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Detalle_Venta)
+
+    End Sub
+
+
+
+    Private Sub Cantidad_ND_Click(sender As Object, e As EventArgs) Handles Cantidad_ND.Click
+
+        'Al agregar la cantidad autimaticamente se generaran los calculos'
+        Dim precio As Double = Val(Txt_Precio.Text)
+        Dim cantidad As Integer = Val(Cantidad_ND.Value.ToString)
+        Dim impuesto As Double = 0.15
+
+        Txt_Total.Text = precio * cantidad
+        Txt_Isv.Text = Txt_Total.Text * impuesto
+        Txt_Subtotal.Text = Txt_Total.Text - Txt_Isv.Text
+
+
+    End Sub
+
+    Private Sub Txt_Efectivo_MouseCaptureChanged(sender As Object, e As EventArgs) Handles Txt_Efectivo.MouseCaptureChanged
+        'calcular el cambio
+        Dim Efectivo As Double = Val(Txt_Efectivo.Text)
+        Txt_Cambio.Text = Efectivo - Txt_Total.Text
+    End Sub
+
+
+
+
+
+
+    Private Sub Txt_Id_Empleado_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Id_Empleado.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Cmb_CodigoProducto_KeyPress(sender As Object, e As KeyPressEventArgs)
+        SoloNumeros(e)
+    End Sub
+
+
+
+    Private Sub Txt_Precio_KeyPress(sender As Object, e As KeyPressEventArgs)
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Cantidad_ND_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Cantidad_ND.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Cantidad_ND_Leave(sender As Object, e As EventArgs) Handles Cantidad_ND.Leave
+        'Agregar al datagridview la información '
+        Dim TotalParcial As Double
+        TotalParcial = (Txt_Precio.Text * Cantidad_ND.Value)
+
+        DGV_Ventas.Rows.Add(Txt_Codigo.Text, Cmb_NombreProd.Text, Txt_Precio.Text, Cantidad_ND.Value, TotalParcial)
+
+        'Agregar a detalle de ventas cada producto
+        ' Me.Detalle_VentaTableAdapter.Insertar_VentaDetalle(Id_FacturaComboBox.Text, Cmb_CodigoProducto.Text, Cantidad_ND.Value, TotalParcial)
+    End Sub
+
+
+
+
+    Private Sub DGV_Ventas_Click(sender As Object, e As EventArgs) Handles DGV_Ventas.Click
+        'Agregar datos del datagridview a los textbox
+        Txt_Codigo.Text = DGV_Ventas.CurrentRow.Cells.Item(0).ToString
+        Cmb_NombreProd.Text = DGV_Ventas.CurrentRow.Cells.Item(1).ToString
+        Txt_Precio.Text = DGV_Ventas.CurrentRow.Cells.Item(2).ToString
+        Cantidad_ND.Value = DGV_Ventas.CurrentRow.Cells.Item(3).ToString
+    End Sub
+
+
+
+    Private Sub Btn_CrearVenta_Click(sender As Object, e As EventArgs) Handles Btn_CrearVenta.Click
+        'registrar la venta
+        If Txt_Id_Empleado.Text = "" Then
+            MsgBox("Por favor llene los campos solicitados", vbObjectError, "ERROR")
+        Else
+
+            Me.VentasTableAdapter.Insertar_Venta(DTP_Fecha.Value, Txt_Id_Empleado.Text, Dtp_Hora.Value.ToShortTimeString)
+            MsgBox(" Se ha registra la venta con exito", vbInformation, "CORRECTO")
+            Limpiar()
+        End If
+    End Sub
+
+    Private Sub Cmb_CodigoProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
+        'If Cmb_CodigoProducto.ValueMember.ToString <> "" Then
+
+        '    Using conexion As New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        '        Dim query As New SqlCommand("select * from Proced_Ventas Codigo_Producto=" + Cmb_CodigoProducto.ToString + "'", conexion)
+        '        query.CommandType = CommandType.StoredProcedure
+
+        '        Dim da As New SqlDataAdapter(query)
+        '        Dim dt As New DataTable
+
+
+        '        If dt.Rows.Count <> 0 Then
+        '            Txt_Nombre.Text = dt.Rows("Nombre_Producto").ToString
+        '            Txt_Precio.Text = dt.Rows("Precio_Producto").ToString
+        '        End If
+        '    End Using
+        'End If
+    End Sub
+
+    Private Sub Id_FacturaComboBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Id_FacturaComboBox.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Cmb_CodigoProducto_KeyPress_1(sender As Object, e As KeyPressEventArgs)
+        SoloNumeros(e)
+    End Sub
+
+    Private Sub Txt_Precio_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Txt_Precio.KeyPress
+        SoloNumeros(e)
+    End Sub
+
+
+End Class
