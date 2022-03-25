@@ -1,0 +1,112 @@
+Public Class Menú
+    Private Sub Menú_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ocultarSubmenu(Panelsub_Inventario)
+        ocultarSubmenu(Panelsub_Ventas)
+        'Se hace el llamado para que los submenus no se muestren al abrir el formulario menú
+    End Sub
+    Private Sub ocultarSubmenu(submenu As Panel)
+        submenu.Visible = False
+    End Sub
+
+    Private Sub mostrarSubmenu(submenu As Panel)
+
+        If submenu.Visible = False Then
+            ocultarSubmenu(Panelsub_Inventario)
+            ocultarSubmenu(Panelsub_Ventas)
+            submenu.Visible = True
+        Else
+            submenu.Visible = False
+        End If
+    End Sub
+
+
+    Private Sub Btn_Des_Inventario_Click(sender As Object, e As EventArgs) Handles Btn_Des_Inventario.Click
+        'Despliega el submmenú de inventario'
+        mostrarSubmenu(Panelsub_Inventario)
+    End Sub
+
+    Private Sub Btn_Des_Ventas_Click(sender As Object, e As EventArgs) Handles Btn_Des_Ventas.Click
+        'Despliega el submenú ventas'
+        mostrarSubmenu(Panelsub_Ventas)
+    End Sub
+
+
+    Private currentForm As Form = Nothing
+    Private Sub AbrirFormularioHijo(FormularioHijo As Form)
+        'Nos permité abrir los formularios en el panel contenedor del menú'
+
+        If currentForm IsNot Nothing Then currentForm.Close()
+        currentForm = FormularioHijo
+        FormularioHijo.TopLevel = False
+        FormularioHijo.FormBorderStyle = FormBorderStyle.None
+        FormularioHijo.Dock = DockStyle.Fill
+        PanelContenedor.Controls.Add(FormularioHijo)
+        PanelContenedor.Tag = FormularioHijo
+        FormularioHijo.BringToFront()
+        FormularioHijo.Show()
+    End Sub
+
+
+
+
+
+    Private Sub Btn_Empleados_Click(sender As Object, e As EventArgs) Handles Btn_Empleados.Click
+        AbrirFormularioHijo(New Empleados)
+    End Sub
+
+    Private Sub Btn_Proveedores_Click(sender As Object, e As EventArgs) Handles Btn_Proveedores.Click
+        AbrirFormularioHijo(New Proveedores)
+    End Sub
+
+    Private Sub Btn_Productos_Click(sender As Object, e As EventArgs) Handles Btn_Compras.Click
+        AbrirFormularioHijo(New Compras)
+    End Sub
+
+    Private Sub Btn_Almacen_Click(sender As Object, e As EventArgs) Handles Btn_Inventario.Click
+        AbrirFormularioHijo(New Inventario)
+    End Sub
+
+    Private Sub Btn_Inf_Ventas_Click(sender As Object, e As EventArgs) Handles Btn_Inf_Ventas.Click
+        AbrirFormularioHijo(New Inf_Ventas)
+    End Sub
+
+    Private Sub Btn_Inf_Compras_Click(sender As Object, e As EventArgs) Handles Btn_Inf_Compras.Click
+        AbrirFormularioHijo(New Inf_Compras)
+    End Sub
+
+    Private Sub Realizar_Ventas_Click(sender As Object, e As EventArgs) Handles Realizar_Ventas.Click
+        AbrirFormularioHijo(New Ventas)
+    End Sub
+
+    Private Sub Inf_Efectivo_Click(sender As Object, e As EventArgs) Handles Inf_Efectivo.Click
+        AbrirFormularioHijo(New Inf_Efectivo)
+    End Sub
+
+    Private Sub Btn_Inf_Inventario_Click(sender As Object, e As EventArgs) Handles Btn_Inf_Inventario.Click
+        AbrirFormularioHijo(New Inf_Inventario)
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        Login.Txt_Usuario.Text = "USUARIO"
+        Login.Txt_Usuario.ForeColor = Color.LightGray
+        Login.Txt_Contraseña.Text = "CONTRASEÑA"
+        Login.Txt_Contraseña.ForeColor = Color.LightGray
+        Login.Txt_Contraseña.UseSystemPasswordChar = False
+
+        Me.Close()
+
+    End Sub
+
+    Private Sub Btn_Cerrar_Click_1(sender As Object, e As EventArgs) Handles Btn_Cerrar.Click
+        'Cerramos completamente la aplicación'
+        Application.Exit()
+    End Sub
+
+    Private Sub Btn_Minimizar_Click(sender As Object, e As EventArgs) Handles Btn_Minimizar.Click
+        'Minimizamos la Pantalla'
+        Me.WindowState = FormWindowState.Minimized
+    End Sub
+
+
+End Class
