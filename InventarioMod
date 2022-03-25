@@ -1,0 +1,25 @@
+'Imports System.Data.Sql
+Imports System.Data.SqlClient
+Module InventarioMod
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+
+
+
+
+    'Busqueda dinamica en Inf_Inventario
+    Sub BusquedaDinamica(ByVal nombre As String)
+        Dim conexion As New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        Dim query As New SqlCommand("Proced_Ventas", conexion)
+        query.CommandType = CommandType.StoredProcedure
+        '        query.Parameters.AddWithValue("Selec * from Proced_Ventas like" & nombre + "%" & "'")
+
+        Dim da As New SqlDataAdapter(query)
+        Dim dt As New DataTable
+        da.Fill(dt)
+
+
+    End Sub
+
+End Module
