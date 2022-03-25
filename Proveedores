@@ -1,0 +1,230 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+Imports System
+Imports System.Text.RegularExpressions
+Public Class Proveedores
+    Public conexion As SqlConnection
+    Private Sub LimpiarCampos()
+        Txt_IdProveedor.Clear()
+        Txt_Nombre.Clear()
+        Txt_Telefono.Clear()
+        Txt_Correo.Clear()
+        Txt_Empresa.Clear()
+        Txt_IdProveedor.Focus()
+    End Sub
+
+    Private Sub Proveedores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
+        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Proveedores' Puede moverla o quitarla según sea necesario.
+        Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+    End Sub
+
+
+    Private Sub Btn_Agregar_Click_1(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
+        If Txt_IdProveedor.Text = "" Or Txt_Nombre.Text = "" Or Txt_Correo.Text = "" Or Txt_Telefono.Text = "" Or Txt_Empresa.Text = "" Then
+            MsgBox("Algunos campos estan vacios, Por favor ingrese la información solicitada", MsgBoxStyle.Critical, "Error")
+        Else
+            Me.ProveedoresTableAdapter.Insertar_Proveedor(Txt_IdProveedor.Text, Txt_Nombre.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Empresa.Text)
+            Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+            LimpiarCampos()
+        End If
+    End Sub
+
+
+
+
+    Private Sub Btn_Borrar_Click_1(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        Dim comando1 As String = "select * from Compras Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
+        Dim da1 As New SqlDataAdapter
+        Dim dt1 As New DataTable
+        da1 = New SqlDataAdapter(comando1, conexion)
+        da1.Fill(dt1)
+
+        If Txt_IdProveedor.Text.Length = 0 Then
+            MsgBox("Ingrese el Id del Proveedor")
+        Else
+            If IsNumeric(Txt_IdProveedor.Text) Then
+
+
+                Try
+                    If dt.Rows.Count <> 0 And Not dt1.Rows.Count <> 0 Then
+                        Me.ProveedoresTableAdapter.Borrar_Proveedor(Txt_IdProveedor.Text)
+                        Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+                        MsgBox("El Proveedor se ha borrado con exito")
+                    ElseIf dt1.Rows.Count <> 0 Then
+                        MsgBox("Este Proveedor no se puede eliminar ya que esta agregado en una compra")
+                    Else
+                        MsgBox("Ese Proveedor no existe")
+
+                    End If
+                Catch ex As Exception
+
+                End Try
+            End If
+
+        End If
+
+    End Sub
+
+    Private Sub Btn_Actualizar_Click_1(sender As Object, e As EventArgs) Handles Btn_Actualizar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+        If Txt_IdProveedor.Text.Length = 0 Then
+            MsgBox("Ingrese el Id del Proveedor")
+        Else
+            If IsNumeric(Txt_IdProveedor.Text) Then
+                Try
+                    If dt.Rows.Count <> 0 Then
+                        Me.ProveedoresTableAdapter.Actualizar_Proveedor(Txt_IdProveedor.Text, Txt_Nombre.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Empresa.Text, Txt_IdProveedor.Text)
+                        Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+                        LimpiarCampos()
+                    Else
+                        MsgBox("Ese Proveedor no existe")
+                        LimpiarCampos()
+                    End If
+                Catch ex As Exception
+
+                End Try
+            End If
+        End If
+    End Sub
+
+
+    Private Sub Btn_Buscar_Click_1(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        Conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        Conexion.Open()
+        Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
+                        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, Conexion)
+        da.Fill(dt)
+        If Txt_IdProveedor.Text.Length = 0 Then
+            MsgBox("Ingrese el Id del Proveedor")
+
+        End If
+        If IsNumeric(Txt_IdProveedor.Text) Then
+
+
+            Try
+                If dt.Rows.Count <> 0 Then
+                    Me.ProveedoresTableAdapter.Buscar_Proveedor(Me.Agrocomercial_AVADataSet.Proveedores, Txt_IdProveedor.Text)
+                Else
+                    MsgBox("Ese Proveedor no existe")
+                    LimpiarCampos()
+                End If
+            Catch ex As Exception
+
+            End Try
+        End If
+    End Sub
+
+    Private Sub Btn_Mostrar_Click(sender As Object, e As EventArgs) Handles Btn_Mostrar.Click
+        Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+    End Sub
+
+    Private Sub Proveedores_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        LimpiarCampos()
+    End Sub
+
+
+    Private Sub Txt_IdProveedor_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_IdProveedor.KeyPress
+        SoloNumeros(e)
+
+        Txt_IdProveedor.MaxLength = 13
+        If Txt_IdProveedor.TextLength >= 13 Then
+            MsgBox("El id no puede contener mas de 13 digitos")
+            Txt_IdProveedor.Select()
+        End If
+    End Sub
+
+    Private Sub Txt_Nombre_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Txt_Nombre.KeyPress
+        SoloLetras(e)
+    End Sub
+
+    Private Sub Txt_Telefono_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Telefono.KeyPress
+        SoloNumeros(e)
+        If Txt_Telefono.TextLength >= 8 Then
+            MsgBox("Limite de caracteres alcanzado")
+        End If
+
+    End Sub
+
+    Private Sub Txt_Telefono_Leave(sender As Object, e As EventArgs) Handles Txt_Telefono.Leave
+        Txt_Telefono.MaxLength = 8
+        If Txt_Telefono.TextLength <> 8 Then
+            MsgBox("El número de teléfono debe contener 8 digitos")
+        Else
+            TelefonoProveedores(Txt_Telefono)
+        End If
+
+        If Txt_Telefono.Text <> "" Then
+            If Txt_Telefono.Text.FirstOrDefault() <> "2" And Txt_Telefono.Text.FirstOrDefault() <> "9" And Txt_Telefono.Text.FirstOrDefault() <> "3" And Txt_Telefono.Text.FirstOrDefault() <> "8" Then
+                MsgBox("El numero que ingreso no es valido en honduras, los numeros validos son: 2, 3, 8 y 9", vbExclamation)
+            End If
+        End If
+
+    End Sub
+
+    Private Sub Txt_Telefono_KeyDown(sender As Object, e As KeyEventArgs) Handles Txt_Telefono.KeyDown
+
+        ' Telefono(Txt_Telefono)
+        'If Txt_Telefono.Text.FirstOrDefault() = "3" Or Txt_Telefono.Text.FirstOrDefault() = "2" Or Txt_Telefono.Text.FirstOrDefault() = "8" Or Txt_Telefono.Text.FirstOrDefault() = "9" Then
+        'Else
+        '    MsgBox("El numero de telefono ingresado no es valido en Honduras, los numeros validos empizan con: 3, 2, 8 y 9")
+        'End If
+    End Sub
+
+    Private Sub Txt_Telefono_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Txt_Telefono.PreviewKeyDown
+        'If Txt_Telefono.Text.FirstOrDefault = "1" Then
+        '    MsgBox("hola")
+        'End If
+    End Sub
+
+    Private Sub Txt_IdProveedor_Leave(sender As Object, e As EventArgs) Handles Txt_IdProveedor.Leave
+        'Txt_IdProveedor.MaxLength = 13
+
+        'If Txt_IdProveedor.Text <> 13 Then
+        '    MsgBox("El id del Proveedor debe contener 13 digitos")
+        '    Txt_IdProveedor.Focus()
+        'Else
+        '    ProveedoresPK(Txt_IdProveedor)
+        'End If
+
+    End Sub
+
+    Private Sub Txt_Empresa_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Empresa.KeyPress
+        ValNombreEmpresa(e)
+    End Sub
+
+    Private Sub Txt_Correo_Leave(sender As Object, e As EventArgs) Handles Txt_Correo.Leave
+        CorreoProveedores(Txt_Correo)
+    End Sub
+
+    Private Sub Btn_Limpiar_Click(sender As Object, e As EventArgs) Handles Btn_Limpiar.Click
+        LimpiarCampos()
+    End Sub
+
+    Private Sub Txt_Nombre_Leave(sender As Object, e As EventArgs) Handles Txt_Nombre.Leave
+        NombreProveedores(Txt_Nombre)
+    End Sub
+
+    Private Sub Txt_Correo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Correo.KeyPress
+        ValCorreo(e)
+    End Sub
+End Class
