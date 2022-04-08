@@ -5,14 +5,9 @@ Module ProveedoresMod
     Public enunciado As SqlCommand
     Public respuesta As SqlDataReader
 
-    Function Telefono(ByVal tel As TextBox)
-        If tel.Text = "3" Then
-        Else
-            MsgBox("ERROR")
-        End If
-    End Function
+
     Sub ProveedoresPK(ByVal Id As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -25,12 +20,11 @@ Module ProveedoresMod
         If dt.Rows.Count <> 0 Then
             MsgBox("Este Id ya se encuentra registrado")
             Id.Clear()
-            Id.Focus()
         End If
     End Sub
 
     Sub NombreProveedores(ByVal Nom As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -43,11 +37,10 @@ Module ProveedoresMod
         If dt.Rows.Count <> 0 Then
             MsgBox("Ya existe un empleado registrado con ese nombre")
             Nom.Clear() 'Se limpia el textbox
-            Nom.Focus()
         End If
     End Sub
     Public Sub CorreoProveedores(ByVal correo As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -60,12 +53,11 @@ Module ProveedoresMod
         If dt.Rows.Count <> 0 Then
             MsgBox("Este correo ya está en uso,elige otro.")
             correo.Clear() 'Se limpia el textbox
-            correo.Focus()
         End If
     End Sub
 
     Sub TelefonoProveedores(ByVal Num As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -78,7 +70,6 @@ Module ProveedoresMod
         If dt.Rows.Count <> 0 Then
             MsgBox("Este número de Teléfono ya se encuentra registrado")
             Num.Clear() 'Se limpia el textbox
-            Num.Focus()
         End If
     End Sub
 
@@ -93,7 +84,7 @@ Module ProveedoresMod
     'End Sub
 
     Sub ValNombreEmpresa(ByRef e As System.Windows.Forms.KeyPressEventArgs)
-        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
+        If Char.IsWhiteSpace(e.KeyChar) Or Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
             e.Handled = False
         Else
             e.Handled = True
