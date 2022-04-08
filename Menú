@@ -34,7 +34,6 @@ Public Class Menú
     Private currentForm As Form = Nothing
     Private Sub AbrirFormularioHijo(FormularioHijo As Form)
         'Nos permité abrir los formularios en el panel contenedor del menú'
-
         If currentForm IsNot Nothing Then currentForm.Close()
         currentForm = FormularioHijo
         FormularioHijo.TopLevel = False
@@ -46,10 +45,7 @@ Public Class Menú
         FormularioHijo.Show()
     End Sub
 
-
-
-
-
+    'Abri cada uno de los formularios desde los botones del menú
     Private Sub Btn_Empleados_Click(sender As Object, e As EventArgs) Handles Btn_Empleados.Click
         AbrirFormularioHijo(New Empleados)
     End Sub
@@ -78,29 +74,18 @@ Public Class Menú
         AbrirFormularioHijo(New Ventas)
     End Sub
 
-    Private Sub Inf_Efectivo_Click(sender As Object, e As EventArgs) Handles Inf_Efectivo.Click
-        AbrirFormularioHijo(New Inf_Efectivo)
-    End Sub
-
     Private Sub Btn_Inf_Inventario_Click(sender As Object, e As EventArgs) Handles Btn_Inf_Inventario.Click
         AbrirFormularioHijo(New Inf_Inventario)
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
-        Login.Txt_Usuario.Text = "USUARIO"
-        Login.Txt_Usuario.ForeColor = Color.LightGray
-        Login.Txt_Contraseña.Text = "CONTRASEÑA"
-        Login.Txt_Contraseña.ForeColor = Color.LightGray
-        Login.Txt_Contraseña.UseSystemPasswordChar = False
-
-        Me.Close()
-
-    End Sub
 
     Private Sub Btn_Cerrar_Click_1(sender As Object, e As EventArgs) Handles Btn_Cerrar.Click
-        'Cerramos completamente la aplicación'
-        Application.Exit()
+        Dim opcion As DialogResult
+        opcion = MessageBox.Show("¿Desea finalizar?", "Salir", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If (opcion = DialogResult.Yes) Then
+            'Cerramos completamente la aplicación'
+            Application.Exit()
+        End If
     End Sub
 
     Private Sub Btn_Minimizar_Click(sender As Object, e As EventArgs) Handles Btn_Minimizar.Click
@@ -108,5 +93,22 @@ Public Class Menú
         Me.WindowState = FormWindowState.Minimized
     End Sub
 
+    Private Sub Btn_CerrarSesion_Click(sender As Object, e As EventArgs) Handles Btn_CerrarSesion.Click
+        Login.Txt_Usuario.Text = "USUARIO"
+        Login.Txt_Usuario.ForeColor = Color.LightGray
+        Login.Txt_Contraseña.Text = "CONTRASEÑA"
+        Login.Txt_Contraseña.ForeColor = Color.LightGray
+        Login.Txt_Contraseña.UseSystemPasswordChar = False
 
+        Dim opcion As DialogResult
+        opcion = MessageBox.Show("¿Seguro que quieres cerrar sesión?", "Salir", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If (opcion = DialogResult.Yes) Then
+            Me.Close()
+            Login.Show()
+        End If
+    End Sub
+
+    Private Sub Btn_Ayuda_Click(sender As Object, e As EventArgs) Handles Btn_Soporte.Click
+        Ayuda.Show()
+    End Sub
 End Class
