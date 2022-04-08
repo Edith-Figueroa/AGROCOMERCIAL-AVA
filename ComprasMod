@@ -1,14 +1,15 @@
 Imports System.Data.Sql
 Imports System.Data.SqlClient
 
-Module ComprasMod
+Module Compras_InventarioMod
 
     Public conexion As SqlConnection
     Public enunciado As SqlCommand
     Public respuesta As SqlDataReader
 
+
     Sub CompraPK(ByVal Id As String)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -23,7 +24,6 @@ Module ComprasMod
         Else
         End If
     End Sub
-
     Sub ValNomProducto(ByRef e As System.Windows.Forms.KeyPressEventArgs)
         '1. Permite tanto letras como números, 2.Permite espacios en blanco, 3. Permite borrar
         If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsWhiteSpace(e.KeyChar) Or Char.IsControl(e.KeyChar) Then
