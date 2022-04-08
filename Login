@@ -1,19 +1,15 @@
 Imports System.Data.SqlClient 'importamos librerias para que nos permita trabajar en la base'
 Public Class Login
-    Private Sub EmpleadosBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs)
-        Me.Validate()
-        Me.EmpleadosBindingSource.EndEdit()
-        Me.TableAdapterManager.UpdateAll(Me.Agrocomercial_AVADataSet)
+    Private Sub Login_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
     End Sub
 
+
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Esta parte de codigo es pare rectificar que tenemos la base de datos conectada con nuestros programa mientras trabajamos'
+
         AbrirConexión()
-
-        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Empleados' Puede moverla o quitarla según sea necesario.
-        Me.EmpleadosTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Empleados)
-
+        Label1.Select()
     End Sub
 
 
@@ -52,11 +48,17 @@ Public Class Login
     End Sub
 
     Private Sub Check_MostrarContraseña_CheckedChanged(sender As Object, e As EventArgs) Handles Check_MostrarContraseña.CheckedChanged
-        If Check_MostrarContraseña.Checked = True Then
-            Txt_Contraseña.UseSystemPasswordChar = False
-        Else
-            Txt_Contraseña.UseSystemPasswordChar = True
+        If Txt_Contraseña.Text = "CONTRASEÑA" Then
+            msjerror("Debes ingresar una contraseña")
 
+        Else
+            Lbl_MsjError.Text = ""
+            If Check_MostrarContraseña.Checked = True Then
+                Txt_Contraseña.UseSystemPasswordChar = False
+            Else
+                Txt_Contraseña.UseSystemPasswordChar = True
+
+            End If
         End If
     End Sub
 
@@ -66,8 +68,13 @@ Public Class Login
     End Sub
 
     Private Sub Btn_Cerrar_Click(sender As Object, e As EventArgs) Handles Btn_Cerrar.Click
-        'Cerramos completamente la aplicación'
-        Application.Exit()
+
+        Dim opcion As DialogResult
+        opcion = MessageBox.Show("¿Desea finalizar?", "Salir", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If (opcion = DialogResult.Yes) Then
+            'Cerramos completamente la aplicación'
+            Application.Exit()
+        End If
     End Sub
 
     Private Sub Llbl_Recuperación_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Llbl_Recuperación.LinkClicked
@@ -85,55 +92,51 @@ Public Class Login
     Private Sub Btn_Acceder_Click(sender As Object, e As EventArgs) Handles Btn_Acceder.Click
 
         'Asignamos los valores de la base de datos al textbox'
-        Dim conexion As String = "Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True"
-        Dim comando As String = "select * from Empleados where Usuario = '" & Txt_Usuario.Text & "'and Contraseña = '" & Txt_Contraseña.Text & "'"
+
+        Dim conexion As String = "Data Source=DESKTOP-18G5VAI\SQLEXPRESS;Initial Catalog=Agrocomercial AVA ;Integrated Security=True"
+        Dim comando As String = "Select * from Empleados where Usuario = '" & Txt_Usuario.Text & "'and Contraseña = '" & Txt_Contraseña.Text & "'"
         Dim da As New SqlDataAdapter
         Dim dt As New DataTable
 
 
 
-        'If Txt_Usuario.Text <> "USUARIO" Then
-        '    If Txt_Contraseña.Text = "CONTRASEÑA" Then
-        '        msjerror("POR FAVOR INGRESE SU CONTRASEÑA")
-        '    Else
-        '        'Try Catch permite que si existe un Error nos muestre cual es'
-        '        Try
-        '            da = New SqlDataAdapter(comando, conexion)
-        '            da.Fill(dt)
+        If Txt_Usuario.Text <> "USUARIO" Then
+            If Txt_Contraseña.Text = "CONTRASEÑA" Then
+                msjerror("POR FAVOR INGRESE SU CONTRASEÑA")
+            Else
+                'Try Catch permite que si existe un Error nos muestre cual es'
+                Try
+                    da = New SqlDataAdapter(comando, conexion)
+                    da.Fill(dt)
 
-        '            'Validar Usuario y contraseña para acceder al sistema'
-        '            If dt.Rows.Count <> 0 Then
+                    'Validar Usuario y contraseña para acceder al sistema'
+                    If dt.Rows.Count <> 0 Then
 
-        '                ' Tipo de Empleados'
-        '                If ConsultarTipoUsuario(Txt_Usuario.Text) = 1 Then
-        '                    Menú.Show()
-        '                ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 2 Then
-        '                    JefeInventario()
-        '                ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 3 Then
-        '                    Ventas.Show()
-        '                End If
+                        ' Tipo de Empleados'
+                        If ConsultarTipoUsuario(Txt_Usuario.Text) = 1 Then
+                            Menú.Show()
+                        ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 2 Then
+                            JefeInventario()
+                        ElseIf ConsultarTipoUsuario(Txt_Usuario.Text) = 3 Then
+                            Cajero()
+                        End If
 
+                    Else
+                        MsgBox("USUARIO O CONTRASEÑA INCORRECTOS")
+                        Txt_Contraseña.Text = "CONTRASEÑA"
+                        Txt_Usuario.Text = "USUARIO"
+                        Check_MostrarContraseña.Checked = False
+                        Txt_Contraseña.UseSystemPasswordChar = False
 
-
-        '            Else
-        '                MsgBox("USUARIO O CONTRASEÑA INCORRECTOS")
-        '                Txt_Contraseña.Text = "CONTRASEÑA"
-        '                Txt_Usuario.Text = "USUARIO"
-        '                Check_MostrarContraseña.Checked = False
-        '                Txt_Contraseña.UseSystemPasswordChar = False
-
-        '            End If
-        '        Catch ex As Exception
-        '            MsgBox(ex.Message)
-        '        End Try
-        '    End If
-        'Else
-        '    msjerror("POR FAVOR INGRESE UN NOMBRE DE USUARIO")
-        'End If
-
-        Menú.Show()
-
-
+                    End If
+                Catch ex As Exception
+                    MsgBox(ex.Message)
+                End Try
+            End If
+        Else
+            msjerror("POR FAVOR INGRESE UN NOMBRE DE USUARIO")
+        End If
     End Sub
+
 
 End Class
