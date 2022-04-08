@@ -2,66 +2,131 @@ Imports System.Data.Sql
 Imports System.Data.SqlClient
 Public Class Inf_Compras
     Public conexion As SqlConnection
-    Sub Limpiarcampos()
-        Txt_CodProducto.Text = ""
-        Txt_CodProducto.Select()
+    Sub CamposVacios(Lbl As Label)
+        Lbl.Text = "        Campo Vacio"
+        Lbl.Visible = True
     End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
-        Conexion.Open()
-        Dim comando As String = "select * from Compras Where Numero_Compra = '" & Txt_CodProducto.Text & "'"
-        Dim da As New SqlDataAdapter
-        Dim dt As New DataTable
-        da = New SqlDataAdapter(comando, Conexion)
-        da.Fill(dt)
-        If Txt_CodProducto.Text.Length = 0 Then
-            MsgBox("Por favor ingrese el codigo de producto")
-        Else
-            If IsNumeric(Txt_CodProducto.Text) Then
-
-
-                Try
-                    If dt.Rows.Count <> 0 Then
-                        Me.ComprasTableAdapter.Buscar_Compra(Me.Agrocomercial_AVADataSet.Compras, Txt_CodProducto.Text)
-                    Else
-                        MsgBox("La Compra no existe")
-                        Txt_CodProducto.Clear()
-                    End If
-                Catch ex As Exception
-
-                End Try
-
-            End If
-
-        End If
+    Sub ValidarOnHigh()
+        Validación.SetHighlightColor(Txt_NumCompra, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
     End Sub
-
+    Sub ValidarOffHigh()
+        Validación.SetHighlightColor(Txt_NumCompra, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+    End Sub
+    Sub OcultarLabels()
+        Lbl_MsjCod.Visible = False
+    End Sub
+    Sub limpiarCampos()
+        Txt_NumCompra.Text = "Número Compra"
+        Txt_NumCompra.ForeColor = Color.Gray
+    End Sub
+    Sub TxtColorBlack()
+        Txt_NumCompra.ForeColor = Color.Black
+    End Sub
     Private Sub Inf_Compras_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
         Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
-
-        Limpiarcampos()
+        limpiarCampos()
     End Sub
 
-    Private Sub DateTimePicker1_ValueChanged(sender As Object, e As EventArgs) Handles Dtp_Fecha.ValueChanged
+    'ESTILO DEL PLACEHOLDER DEL CODIGO DEL PRODUCTO
+    Private Sub Txt_CodProducto_TextChanged(sender As Object, e As EventArgs) Handles Txt_NumCompra.TextChanged
+        With Txt_NumCompra
+            If .Text = "" Then
+                .Text = "Número Compra"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 13 Then
+                If StrReverse(StrReverse(.Text).Remove(13)) = "Número Compra" Then
+                    .Text = .Text.Remove(.TextLength - 13)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_CodProducto_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_NumCompra.MouseDown
+        With Txt_NumCompra
+            If .Text = "Número Compra" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_CodProducto_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_NumCompra.MouseMove
+        With Txt_NumCompra
+            If .Text = "Número Compra" And .ForeColor = Color.Gray Then
+                .Select(0, 0)
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_CodProducto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_NumCompra.KeyPress
+        SoloNumeros(e)
+
+
+        Txt_NumCompra.MaxLength = 15
+        If Txt_NumCompra.TextLength >= 15 Then
+            MsgBox("Limite de caracteres alcanzado")
+        End If
+
+    End Sub
+
+    Private Sub Dtp_Fecha_ValueChanged(sender As Object, e As EventArgs) Handles Dtp_Fecha.ValueChanged
         ' Fecha del control DateTimePicker
-        '
+
         Dim fecha As String =
             String.Format("{0:#MM\/dd\/yyyy#}", Dtp_Fecha.Value)
 
         ' Establecemos el filtro
         Me.ComprasBindingSource.Filter = "Fecha_Compra = " & fecha
-
     End Sub
+
+
 
     Private Sub Btn_MostrarTodo_Click(sender As Object, e As EventArgs) Handles Btn_MostrarTodo.Click
-        Me.ComprasBindingSource.Filter = True
         Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
-        Limpiarcampos()
     End Sub
 
-    Private Sub Txt_CodProducto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_CodProducto.KeyPress
-        SoloNumeros(e)
+    Private Sub Btn_Buscar_Click_1(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        If Txt_NumCompra.Text = "Número Compra" Then
+            MsgBox("Por favor ingrese el número de la compra")
+            ValidarOnHigh()
+            CamposVacios(Lbl_MsjCod)
+        Else
+            If IsNumeric(Txt_NumCompra.Text) Then
+                ValidarOffHigh()
+                OcultarLabels()
+
+                Dim comando As String = "select * from Compras Where Numero_Compra = '" & Txt_NumCompra.Text & "'"
+                Dim da As New SqlDataAdapter
+                Dim dt As New DataTable
+                da = New SqlDataAdapter(comando, conexion)
+                da.Fill(dt)
+
+                Try
+
+                    If dt.Rows.Count <> 0 Then
+                        Me.ComprasTableAdapter.Buscar_Compra(Me.Agrocomercial_AVADataSet.Compras, Txt_NumCompra.Text)
+                    Else
+                        MsgBox("La Compra no existe")
+                        Txt_NumCompra.Clear()
+                    End If
+                Catch ex As Exception
+
+                End Try
+                limpiarCampos()
+
+            End If
+
+        End If
     End Sub
 End Class
