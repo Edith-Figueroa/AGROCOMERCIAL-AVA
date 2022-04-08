@@ -3,41 +3,98 @@ Imports System.Data.SqlClient
 Imports System
 Imports System.Text.RegularExpressions
 Public Class Proveedores
-    Public conexion As SqlConnection
-    Private Sub LimpiarCampos()
-        Txt_IdProveedor.Clear()
-        Txt_Nombre.Clear()
-        Txt_Telefono.Clear()
-        Txt_Correo.Clear()
-        Txt_Empresa.Clear()
-        Txt_IdProveedor.Focus()
-    End Sub
-
     Private Sub Proveedores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
-        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
-        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
-        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
         'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Proveedores' Puede moverla o quitarla según sea necesario.
         Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+
+    End Sub
+    Public conexion As SqlConnection
+
+    Sub CamposVacios(Lbl As Label)
+        Lbl.Text = "        Campo Vacio"
+        Lbl.Visible = True
+    End Sub
+
+    Sub OcultarLabels()
+        Lbl_MsjId.Visible = False
+        Lbl_MsjNombre.Visible = False
+        Lbl_MsjTelefono.Visible = False
+        Lbl_MsjCorreo.Visible = False
+        Lbl_MsjEmpresa.Visible = False
+    End Sub
+
+    Private Sub LimpiarCampos()
+        Txt_IdProveedor.Text = "Id"
+        Txt_IdProveedor.ForeColor = Color.Gray
+        Txt_Nombre.Text = "Nombre"
+        Txt_Nombre.ForeColor = Color.Gray
+        Txt_Telefono.Text = "Teléfono"
+        Txt_Telefono.ForeColor = Color.Gray
+        Txt_Correo.Text = "Correo"
+        Txt_Correo.ForeColor = Color.Gray
+        Txt_Empresa.Text = "Empresa"
+        Txt_Empresa.ForeColor = Color.Gray
+
     End Sub
 
 
-    Private Sub Btn_Agregar_Click_1(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
-        If Txt_IdProveedor.Text = "" Or Txt_Nombre.Text = "" Or Txt_Correo.Text = "" Or Txt_Telefono.Text = "" Or Txt_Empresa.Text = "" Then
+    Sub TxtColorBlack()
+        Txt_IdProveedor.ForeColor = Color.Black
+        Txt_Nombre.ForeColor = Color.Black
+        Txt_Telefono.ForeColor = Color.Black
+        Txt_Correo.ForeColor = Color.Black
+        Txt_Empresa.ForeColor = Color.Black
+    End Sub
+
+    Sub ValidarOnHigh()
+        Validación.SetHighlightColor(Txt_IdProveedor, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Validación.SetHighlightColor(Txt_Nombre, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Validación.SetHighlightColor(Txt_Telefono, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Validación.SetHighlightColor(Txt_Correo, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Validación.SetHighlightColor(Txt_Empresa, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+    End Sub
+
+    Sub ValidarOffHigh()
+        Validación.SetHighlightColor(Txt_IdProveedor, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        Validación.SetHighlightColor(Txt_Nombre, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        Validación.SetHighlightColor(Txt_Telefono, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        Validación.SetHighlightColor(Txt_Correo, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        Validación.SetHighlightColor(Txt_Empresa, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+    End Sub
+
+
+    Private Sub Btn_Agregar_Click(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
+        If Txt_IdProveedor.Text = "Id" And Txt_Nombre.Text = "Nombre" And Txt_Correo.Text = "Correo" And Txt_Telefono.Text = "Teléfono" And Txt_Empresa.Text = "Empresa" Then
             MsgBox("Algunos campos estan vacios, Por favor ingrese la información solicitada", MsgBoxStyle.Critical, "Error")
-        Else
-            Me.ProveedoresTableAdapter.Insertar_Proveedor(Txt_IdProveedor.Text, Txt_Nombre.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Empresa.Text)
-            Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+            'se mostrara el highlighter en los textbox 
+            ValidarOnHigh()
+            CamposVacios(Lbl_MsjId)
+            CamposVacios(Lbl_MsjNombre)
+            CamposVacios(Lbl_MsjEmpresa)
+            CamposVacios(Lbl_MsjTelefono)
+            CamposVacios(Lbl_MsjCorreo)
+        ElseIf Txt_IdProveedor.Text = "Id" Or Txt_Nombre.Text = "Nombre" Or Txt_Correo.Text = "Correo" Or Txt_Telefono.Text = "Teléfono" Or Txt_Empresa.Text = "Empresa" Then
+            MsgBox("Algunos campos estan vacios, Por favor ingrese la información solicitada", MsgBoxStyle.Critical, "Error")
             LimpiarCampos()
+            OcultarLabels()
+            ValidarOffHigh()
+
+        Else
+            'Me.ProveedoresTableAdapter.Insertar_Proveedor(Txt_IdProveedor.Text, Txt_Nombre.Text, Txt_Telefono.Text, Txt_Correo.Text, Txt_Empresa.Text)
+            'Me.ProveedoresTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Proveedores)
+            MsgBox("Se ha agregado el Proveedor con exito", vbInformation, "Correcto")
+            LimpiarCampos()
+            OcultarLabels()
+            ValidarOffHigh()
         End If
+
     End Sub
 
 
 
 
     Private Sub Btn_Borrar_Click_1(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
         Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
         Dim da As New SqlDataAdapter
@@ -51,7 +108,7 @@ Public Class Proveedores
         da1 = New SqlDataAdapter(comando1, conexion)
         da1.Fill(dt1)
 
-        If Txt_IdProveedor.Text.Length = 0 Then
+        If Txt_IdProveedor.Text = "Id" Then
             MsgBox("Ingrese el Id del Proveedor")
         Else
             If IsNumeric(Txt_IdProveedor.Text) Then
@@ -66,7 +123,6 @@ Public Class Proveedores
                         MsgBox("Este Proveedor no se puede eliminar ya que esta agregado en una compra")
                     Else
                         MsgBox("Ese Proveedor no existe")
-
                     End If
                 Catch ex As Exception
 
@@ -78,7 +134,7 @@ Public Class Proveedores
     End Sub
 
     Private Sub Btn_Actualizar_Click_1(sender As Object, e As EventArgs) Handles Btn_Actualizar.Click
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
         Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
         Dim da As New SqlDataAdapter
@@ -106,13 +162,13 @@ Public Class Proveedores
     End Sub
 
 
-    Private Sub Btn_Buscar_Click_1(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
-        Conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
-        Conexion.Open()
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
         Dim comando As String = "select * from Proveedores Where Id_Proveedor = '" & Txt_IdProveedor.Text & "'"
-                        Dim da As New SqlDataAdapter
+        Dim da As New SqlDataAdapter
         Dim dt As New DataTable
-        da = New SqlDataAdapter(comando, Conexion)
+        da = New SqlDataAdapter(comando, conexion)
         da.Fill(dt)
         If Txt_IdProveedor.Text.Length = 0 Then
             MsgBox("Ingrese el Id del Proveedor")
@@ -149,35 +205,55 @@ Public Class Proveedores
         Txt_IdProveedor.MaxLength = 13
         If Txt_IdProveedor.TextLength >= 13 Then
             MsgBox("El id no puede contener mas de 13 digitos")
-            Txt_IdProveedor.Select()
+            Txt_IdProveedor.Clear()
         End If
     End Sub
 
-    Private Sub Txt_Nombre_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Txt_Nombre.KeyPress
+    Private Sub Txt_Nombre_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Nombre.KeyPress
         SoloLetras(e)
     End Sub
 
     Private Sub Txt_Telefono_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Telefono.KeyPress
         SoloNumeros(e)
-        If Txt_Telefono.TextLength >= 8 Then
-            MsgBox("Limite de caracteres alcanzado")
+        If Txt_Telefono.Text = "Teléfono" Then
+            Txt_Telefono.MaxLength = 9
+        Else
+            Txt_Telefono.MaxLength = 8
+            If Txt_Telefono.TextLength >= 8 Then
+                MsgBox("Limite de caracteres alcanzado")
+            End If
         End If
+
+
+
 
     End Sub
 
     Private Sub Txt_Telefono_Leave(sender As Object, e As EventArgs) Handles Txt_Telefono.Leave
-        Txt_Telefono.MaxLength = 8
-        If Txt_Telefono.TextLength <> 8 Then
-            MsgBox("El número de teléfono debe contener 8 digitos")
+        If Txt_Telefono.Text = "Teléfono" Then
+            Validación.SetHighlightColor(Txt_Telefono, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            CamposVacios(Lbl_MsjTelefono)
         Else
-            TelefonoProveedores(Txt_Telefono)
-        End If
-
-        If Txt_Telefono.Text <> "" Then
-            If Txt_Telefono.Text.FirstOrDefault() <> "2" And Txt_Telefono.Text.FirstOrDefault() <> "9" And Txt_Telefono.Text.FirstOrDefault() <> "3" And Txt_Telefono.Text.FirstOrDefault() <> "8" Then
-                MsgBox("El numero que ingreso no es valido en honduras, los numeros validos son: 2, 3, 8 y 9", vbExclamation)
+            Txt_Telefono.MaxLength = 8
+            If Txt_Telefono.TextLength <> 8 Then
+                Validación.SetHighlightColor(Txt_Telefono, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+                Lbl_MsjTelefono.Text = "     El número debe contener 8 digitos "
+                Lbl_MsjTelefono.Visible = True
+                Txt_Telefono.Clear()
+            Else
+                Validación.SetHighlightColor(Txt_Telefono, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+                Lbl_MsjTelefono.Visible = False
+                TelefonoProveedores(Txt_Telefono)
             End If
         End If
+
+
+
+        If Txt_Telefono.Text.FirstOrDefault() <> "2" And Txt_Telefono.Text.FirstOrDefault() <> "9" And Txt_Telefono.Text.FirstOrDefault() <> "3" And Txt_Telefono.Text.FirstOrDefault() <> "8" Then
+            MsgBox("El numero que ingreso no es valido en honduras, los numeros validos son: 2, 3, 8 y 9", vbExclamation)
+            Txt_Telefono.Clear()
+        End If
+
 
     End Sub
 
@@ -190,22 +266,22 @@ Public Class Proveedores
         'End If
     End Sub
 
-    Private Sub Txt_Telefono_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Txt_Telefono.PreviewKeyDown
-        'If Txt_Telefono.Text.FirstOrDefault = "1" Then
-        '    MsgBox("hola")
-        'End If
-    End Sub
 
     Private Sub Txt_IdProveedor_Leave(sender As Object, e As EventArgs) Handles Txt_IdProveedor.Leave
-        'Txt_IdProveedor.MaxLength = 13
-
-        'If Txt_IdProveedor.Text <> 13 Then
-        '    MsgBox("El id del Proveedor debe contener 13 digitos")
-        '    Txt_IdProveedor.Focus()
-        'Else
-        '    ProveedoresPK(Txt_IdProveedor)
-        'End If
-
+        Txt_IdProveedor.MaxLength = 13
+        If Txt_IdProveedor.Text = "Id" Then
+            CamposVacios(Lbl_MsjId)
+            Validación.SetHighlightColor(Txt_IdProveedor, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        ElseIf Txt_IdProveedor.TextLength <> 13 Then
+            Lbl_MsjId.Text = "     El id del Proveedor debe contener 13 digitos"
+            Validación.SetHighlightColor(Txt_IdProveedor, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            Lbl_MsjId.Visible = True
+            Txt_IdProveedor.Clear()
+        Else
+            Validación.SetHighlightColor(Txt_IdProveedor, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+            Lbl_MsjId.Visible = False
+            ProveedoresPK(Txt_IdProveedor)
+        End If
     End Sub
 
     Private Sub Txt_Empresa_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Empresa.KeyPress
@@ -213,7 +289,17 @@ Public Class Proveedores
     End Sub
 
     Private Sub Txt_Correo_Leave(sender As Object, e As EventArgs) Handles Txt_Correo.Leave
-        CorreoProveedores(Txt_Correo)
+
+        If Txt_Correo.Text = "Correo" Then
+            Validación.SetHighlightColor(Txt_Correo, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            CamposVacios(Lbl_MsjCorreo)
+        Else
+            correoval(Txt_Correo.Text, Txt_Correo)
+            Validación.SetHighlightColor(Txt_Correo, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+            Lbl_MsjCorreo.Visible = False
+        End If
+
+
     End Sub
 
     Private Sub Btn_Limpiar_Click(sender As Object, e As EventArgs) Handles Btn_Limpiar.Click
@@ -221,10 +307,229 @@ Public Class Proveedores
     End Sub
 
     Private Sub Txt_Nombre_Leave(sender As Object, e As EventArgs) Handles Txt_Nombre.Leave
-        NombreProveedores(Txt_Nombre)
+        If Txt_Nombre.Text = "Nombre" Then
+            CamposVacios(Lbl_MsjNombre)
+            Validación.SetHighlightColor(Txt_Nombre, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Else
+            NombreProveedores(Txt_Nombre)
+            Espacios(Txt_Nombre)
+            Lbl_MsjNombre.Visible = False
+            Validación.SetHighlightColor(Txt_Nombre, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        End If
     End Sub
 
     Private Sub Txt_Correo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Correo.KeyPress
         ValCorreo(e)
     End Sub
+
+    Private Sub ProveedoresDataGridView_Click(sender As Object, e As EventArgs) Handles ProveedoresDataGridView.Click
+        'Pasar del datagridview a los textbox
+        Txt_IdProveedor.Text = ProveedoresDataGridView.CurrentRow.Cells.Item(0).Value.ToString
+        Txt_Nombre.Text = ProveedoresDataGridView.CurrentRow.Cells.Item(1).Value.ToString
+        Txt_Telefono.Text = ProveedoresDataGridView.CurrentRow.Cells.Item(2).Value.ToString
+        Txt_Correo.Text = ProveedoresDataGridView.CurrentRow.Cells.Item(3).Value.ToString
+        Txt_Empresa.Text = ProveedoresDataGridView.CurrentRow.Cells.Item(4).Value.ToString
+        TxtColorBlack()
+        OcultarLabels()
+    End Sub
+
+    'ESTILO DEL PLACEHOLDER DE ID proveedor
+    Private Sub Txt_IdProveedor_TextChanged(sender As Object, e As EventArgs) Handles Txt_IdProveedor.TextChanged
+        With Txt_IdProveedor
+            If .Text = "" Then
+                .Text = "Id"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 2 Then
+                If StrReverse(StrReverse(.Text).Remove(2)) = "Id" Then
+                    .Text = .Text.Remove(.TextLength - 2)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+    Private Sub Txt_IdProveedor_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_IdProveedor.MouseDown
+        With Txt_IdProveedor
+            If .Text = "Id" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+    Private Sub Txt_IdProveedor_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_IdProveedor.MouseMove
+        With Txt_IdProveedor
+            If .Text = "Id" And .ForeColor = Color.Gray Then
+                Txt_IdProveedor.Select(0, 0)
+            End If
+        End With
+    End Sub
+
+    'ESTILO DEL PLACEHOLDER DE NOMBRE
+    Private Sub Txt_Nombre_TextChanged(sender As Object, e As EventArgs) Handles Txt_Nombre.TextChanged
+        With Txt_Nombre
+            If .Text = "" Then
+                .Text = "Nombre"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 6 Then
+                If StrReverse(StrReverse(.Text).Remove(6)) = "Nombre" Then
+                    .Text = .Text.Remove(.TextLength - 6)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+    Private Sub Txt_Nombre_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_Nombre.MouseDown
+        With Txt_Nombre
+            If .Text = "Nombre" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+    Private Sub Txt_Nombre_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_Nombre.MouseMove
+        With Txt_Nombre
+            If .Text = "Nombre" And .ForeColor = Color.Gray Then
+                Txt_Nombre.Select(0, 0)
+            End If
+        End With
+    End Sub
+
+    'placeholder de Telefono'
+    Private Sub Txt_Telefono_TextChanged(sender As Object, e As EventArgs) Handles Txt_Telefono.TextChanged
+        With Txt_Telefono
+            If .Text = "" Then
+                .Text = "Teléfono"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 8 Then
+                If StrReverse(StrReverse(.Text).Remove(8)) = "Teléfono" Then
+                    .Text = .Text.Remove(.TextLength - 8)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Telefono_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_Telefono.MouseDown
+        With Txt_Telefono
+            If .Text = "Teléfono" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Telefono_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_Telefono.MouseMove
+        With Txt_Telefono
+            If .Text = "Teléfono" And .ForeColor = Color.Gray Then
+                .Select(0, 0)
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Correo_TextChanged(sender As Object, e As EventArgs) Handles Txt_Correo.TextChanged
+        With Txt_Correo
+            If .Text = "" Then
+                .Text = "Correo"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 6 Then
+                If StrReverse(StrReverse(.Text).Remove(6)) = "Correo" Then
+                    .Text = .Text.Remove(.TextLength - 6)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Correo_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_Correo.MouseDown
+        With Txt_Correo
+            If .Text = "Correo" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Correo_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_Correo.MouseMove
+        With Txt_Correo
+            If .Text = "Correo" And .ForeColor = Color.Gray Then
+                .Select(0, 0)
+            End If
+        End With
+    End Sub
+
+    'placeholder de empresa'
+    Private Sub Txt_Empresa_TextChanged(sender As Object, e As EventArgs) Handles Txt_Empresa.TextChanged
+        With Txt_Empresa
+            If .Text = "" Then
+                .Text = "Empresa"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 7 Then
+                If StrReverse(StrReverse(.Text).Remove(7)) = "Empresa" Then
+                    .Text = .Text.Remove(.TextLength - 7)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Empresa_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_Empresa.MouseDown
+        With Txt_Empresa
+            If .Text = "Empresa" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_Empresa_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_Empresa.MouseMove
+        With Txt_Empresa
+            If .Text = "Empresa" And .ForeColor = Color.Gray Then
+                .Select(0, 0)
+            End If
+        End With
+    End Sub
+
+
+
+    Private Sub Txt_Empresa_Leave(sender As Object, e As EventArgs) Handles Txt_Empresa.Leave
+        If Txt_Empresa.Text = "Empresa" Then
+            Validación.SetHighlightColor(Txt_Empresa, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            CamposVacios(Lbl_MsjEmpresa)
+
+        Else
+            Validación.SetHighlightColor(Txt_Empresa, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+            Lbl_MsjEmpresa.Visible = False
+            Espacios(Txt_Empresa)
+        End If
+    End Sub
+
 End Class
