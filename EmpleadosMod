@@ -7,7 +7,7 @@ Module EmpleadosMod
 
     'No permite repetir el Id del empleado.
     Sub EmpleadosPK(ByVal Id As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox.
@@ -19,13 +19,15 @@ Module EmpleadosMod
 
         If dt.Rows.Count <> 0 Then
             MsgBox("Este Id ya se encuentra registrado")
+            Id.Clear()
+            Id.Focus()
         End If
     End Sub
 
 
     'No permite repetir el Nombre del empleado.
     Sub NombreEmpleados(ByVal Nombre As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox.
@@ -45,7 +47,7 @@ Module EmpleadosMod
 
     'No permite repetir el Teléfono del empleado.
     Sub TelefonoEmpleados(ByVal Num As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox.
@@ -66,7 +68,7 @@ Module EmpleadosMod
 
     'No permite repetir el Correo del empleado.
     Sub CorreoEmpleados(ByVal correo As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox.
@@ -86,7 +88,7 @@ Module EmpleadosMod
 
     'No permite repetir el Nombre de usuario del empleado.
     Sub UsuarioEmpleados(ByVal Usuario As TextBox)
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         'Asignamos los valores de la base de datos al textbox'
@@ -105,12 +107,15 @@ Module EmpleadosMod
 
 
     'Nos permite validar que tipo de datos permitirá La dirección.
-    Sub ValDireccion(ByRef e As System.Windows.Forms.KeyPressEventArgs)
-        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or Char.IsWhiteSpace(e.KeyChar) Or e.KeyChar = "," Or e.KeyChar = "." Then
+    Sub ValDireccion(ByRef e As System.Windows.Forms.KeyPressEventArgs, Direccion As TextBox)
+        If Char.IsWhiteSpace(e.KeyChar) Or Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "," Or e.KeyChar = "." Then
             e.Handled = False
         Else
             e.Handled = True
             MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y comas(,).", MsgBoxStyle.Exclamation, "Error")
+            Empleados.Validación.SetHighlightColor(Direccion, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            Empleados.Lbl_MsjDireccion.Text = "        Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y comas(,)."
+            Empleados.Lbl_MsjDireccion.Visible = True
         End If
     End Sub
 
@@ -126,12 +131,25 @@ Module EmpleadosMod
 
     'Nos permite validar que tipo de datos se pueden ingresar en el Nombre de usuario. 
     Sub ValUsuario(ByRef e As System.Windows.Forms.KeyPressEventArgs)
-        If Char.IsLetterOrDigit(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
+        If Char.IsLetterOrDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or e.KeyChar = "." Or e.KeyChar = "-" Or e.KeyChar = "_" Then
             e.Handled = False
         Else
             e.Handled = True
             MsgBox("Lo sentimos solo puedes agregar letras(a-z), numero(0-9), puntos(.) y guiones(- _).", MsgBoxStyle.Exclamation, "Error")
         End If
     End Sub
+    Sub ValContraseñas(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsWhiteSpace(e.KeyChar) Then
+            MsgBox("no se aceptan espacios en blanco", MsgBoxStyle.Exclamation)
+            e.Handled = True
+        End If
+    End Sub
 
+    Sub correoval(Correo As String, textb As TextBox)
+        If (Correo Like "?*@?*.?*") Then
+        Else
+            MessageBox.Show("correo invalido, El correo debe contener las siguiente estructura. Nombre de Usuario + @ + dominio + .com")
+            textb.Clear()
+        End If
+    End Sub
 End Module
