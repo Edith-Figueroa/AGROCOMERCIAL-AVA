@@ -1,0 +1,30 @@
+Public Class Ayuda
+    Private Sub Link_AlexaW_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_AlexaW.LinkClicked
+        Process.Start("https://api.whatsapp.com/send/?phone=%2B50495964305&text&app_absent=0")
+    End Sub
+
+    Private Sub Link_GrupoW_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_GrupoW.LinkClicked
+        Process.Start("https://chat.whatsapp.com/H0BdqhwX0FH6ENX7DlqjNa")
+    End Sub
+
+    Private Sub Link_CarlosW_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_CarlosW.LinkClicked
+        Process.Start("https://api.whatsapp.com/send/?phone=%2B19788900661&text&app_absent=0")
+    End Sub
+
+    Private Sub Link_EdithW_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_EdithW.LinkClicked
+        Process.Start("https://api.whatsapp.com/send/?phone=%2B50497618566&text&app_absent=0")
+    End Sub
+
+    Private Sub Link_JonnyW_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_JonnyW.LinkClicked
+        Process.Start("https://api.whatsapp.com/send/?phone=%2B50432599899&text&app_absent=0")
+    End Sub
+
+    Private Sub Link_Gmail_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles Link_Gmail.LinkClicked
+        Process.Start("https://mail.google.com/mail/u/0/#inbox?compose=CllgCJvrcXhDHFRTwfDVMjNvwlkkQfCVKwNzXVNgXNnPdRCsXPtvNCCbtrkQBhxHWFmZTLkwNZg")
+    End Sub
+
+    Private Sub Btn_Cerrar_Click(sender As Object, e As EventArgs) Handles Btn_Cerrar.Click
+        Me.Close()
+    End Sub
+
+End Class
