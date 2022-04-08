@@ -1,15 +1,5 @@
 Imports System.Data.SqlClient
 Public Class Inventario
-    Public conexion As SqlConnection
-    Sub LimpiarCampos()
-        Txt_CodProducto.Text = ""
-        Numero_CompraComboBox.Text = ""
-        Txt_CantidadProducto.Text = ""
-        Txt_Precio_Compra.Text = ""
-        Txt_Precio_Venta.Text = ""
-        Txt_CodProducto.Select()
-    End Sub
-
     Private Sub Inventario_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
         Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
@@ -18,55 +8,116 @@ Public Class Inventario
 
         LimpiarCampos()
     End Sub
+    Public conexion As SqlConnection
+    Sub LimpiarCampos()
+        Txt_CodProducto.Text = "Codigo Producto"
+        Txt_CodProducto.ForeColor = Color.Gray
+        Txt_NombreProducto.Text = "Nombre Producto"
+        Txt_NombreProducto.ForeColor = Color.Gray
+        Txt_CantidadProducto.Text = "Cantidad Producto"
+        Txt_CantidadProducto.ForeColor = Color.Gray
+        Txt_Precio_Venta.Text = "Precio venta"
+        Txt_Precio_Venta.ForeColor = Color.Gray
+        Txt_Precio_Compra.Text = "Precio Compra"
+        Txt_Precio_Compra.ForeColor = Color.Gray
+        Numero_CompraComboBox.Text = "Seleccione el Numero de compra..."
+        Numero_CompraComboBox.ForeColor = Color.Gray
+    End Sub
+
+    Sub TxtColorBlack()
+        Txt_CodProducto.ForeColor = Color.Black
+        Txt_NombreProducto.ForeColor = Color.Black
+        Txt_CantidadProducto.ForeColor = Color.Black
+        Numero_CompraComboBox.ForeColor = Color.Black
+        Txt_Precio_Venta.ForeColor = Color.Black
+        Txt_Precio_Compra.ForeColor = Color.Black
+    End Sub
 
 
+    Sub OcultarLabels()
+        Lbl_MsjCodigo.Visible = False
+        Lbl_MsjNumcompra.Visible = False
+    End Sub
+
+    Sub ValidarOnHigh()
+        Validación.SetHighlightColor(Txt_CodProducto, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+        Validación.SetHighlightColor(Numero_CompraComboBox, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+    End Sub
+
+    Sub ValidarOffHigh()
+        Validación.SetHighlightColor(Txt_CodProducto, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+        Validación.SetHighlightColor(Numero_CompraComboBox, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+    End Sub
+
+
+    Sub CamposVacios(Lbl As Label)
+        Lbl.Text = "        Campo Vacio"
+        Lbl.Visible = True
+    End Sub
     Private Sub Btn_Agregar_Click(sender As Object, e As EventArgs) Handles Btn_Agregar.Click
 
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        If Txt_CodProducto.Text = "Codigo Producto" And Numero_CompraComboBox.Text = "Seleccione el Numero de compra..." And Txt_NombreProducto.Text = "Nombre Producto" And Txt_CantidadProducto.Text = "Cantidad Producto" And Txt_Precio_Venta.Text = "Precio venta" And Txt_Precio_Compra.Text = "Precio Compra" Then
+            MsgBox("no se permiten campos vacios ", vbObjectError, "Error")
+            ValidarOnHigh()
+            CamposVacios(Lbl_MsjCodigo)
+            CamposVacios(Lbl_MsjNumcompra)
+        ElseIf Txt_CodProducto.Text = "Codigo Producto" Or Numero_CompraComboBox.Text = "Seleccione el Numero de compra..." Or Txt_NombreProducto.Text = "Nombre Producto" Or Txt_CantidadProducto.Text = "Cantidad Producto" Or Txt_Precio_Venta.Text = "Precio venta" Or Txt_Precio_Compra.Text = "Precio Compra" Then
+
+            MsgBox("no se permiten campos vacios ", vbObjectError, "Error")
+            LimpiarCampos()
+            ValidarOffHigh()
+            OcultarLabels()
+
+        Else
+            If IsNumeric(Txt_CodProducto.Text) Then
+                conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+                conexion.Open()
+
+                'Asignamos los valores de la base de datos al textbox'
+                Dim comando As String = "Select * from Inventario where  Nombre_Producto = '" & Txt_NombreProducto.Text & "'"
+                Dim da As New SqlDataAdapter
+                Dim dt As New DataTable
+                da = New SqlDataAdapter(comando, conexion)
+                da.Fill(dt)
+
+                Dim comando2 As String = "Select * from Inventario where Numero_Compra = '" & Numero_CompraComboBox.Text & "'"
+                Dim da2 As New SqlDataAdapter
+                Dim dt2 As New DataTable
+                da2 = New SqlDataAdapter(comando2, conexion)
+                da2.Fill(dt2)
+
+                If dt.Rows.Count <> 0 Then
+                    If dt2.Rows.Count <> 0 Then
+                        MsgBox("Esta compra ya está registrada, por favor elija otra")
+                    Else
+                        Dim Cmd As New SqlCommand("Update Inventario Set Precio_Producto='" & Txt_Precio_Venta.Text & "',Cantidad_Existente =Cantidad_Existente +" & Txt_CantidadProducto.Text & "Where Codigo_Producto =" & Txt_CodProducto.Text & "", conexion)
+                        Cmd.ExecuteNonQuery()
+                        InventarioTableAdapter.Fill(Agrocomercial_AVADataSet.Inventario)
+                        MsgBox("Se ha Agregado el producto correctamente", vbInformation, "Correcto")
+                    End If
+                Else
+                    InventarioTableAdapter.Insertar_Almacen(Txt_CodProducto.Text, Txt_NombreProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text)
+                    InventarioTableAdapter.Fill(Agrocomercial_AVADataSet.Inventario)
+                    MsgBox("Se ha Agregado el producto correctamente", vbInformation, "Correcto")
+                    LimpiarCampos()
+                End If
+            End If
+
+        End If
+
+
+    End Sub
+
+    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
-        'Asignamos los valores de la base de datos al textbox'
-        Dim comando As String = "Select * from Inventario where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
+        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
         Dim da As New SqlDataAdapter
         Dim dt As New DataTable
         da = New SqlDataAdapter(comando, conexion)
         da.Fill(dt)
 
-        Dim comando2 As String = "Select * from Inventario where Numero_Compra = '" & Numero_CompraComboBox.Text & "'"
-        Dim da2 As New SqlDataAdapter
-        Dim dt2 As New DataTable
-        da2 = New SqlDataAdapter(comando2, conexion)
-        da2.Fill(dt2)
-
-
-        Dim Compra As Double = Txt_Precio_Compra.Text
-        Txt_Precio_Venta.Text = FormatNumber((Compra * 0.15 + Compra), 2)
-
-        If Txt_CodProducto.Text = "" Or Numero_CompraComboBox.Text = "" Or Txt_CantidadProducto.Text = "" Or Txt_Precio_Venta.Text = "" Or Txt_Precio_Compra.Text = "" Then
-            MsgBox("Algunos campos estan vacios, Por favor ingrese la información solicitada", MsgBoxStyle.Critical, "Error")
-        Else
-            If dt.Rows.Count <> 0 Then
-                MsgBox("Ya existe un Producto con este codigo")
-            ElseIf dt2.Rows.Count <> 0 Then
-                MsgBox("Esta compra ya está registrada, por favor elija otra")
-            Else
-                InventarioTableAdapter.Insertar_Almacen(Txt_CodProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text)
-                InventarioTableAdapter.Fill(Agrocomercial_AVADataSet.Inventario)
-                MsgBox("Se ha Agregado el producto correctamente", vbInformation, "Correcto")
-            End If
-
-        End If
-    End Sub
-
-    Private Sub Btn_Buscar_Click(sender As Object, e As EventArgs) Handles Btn_Buscar.Click
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
-        conexion.Open()
-        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
-        Dim da As New SqlDataAdapter
-        Dim dt As New DataTable
-        da = New SqlDataAdapter(comando, Conexion)
-        da.Fill(dt)
-
-        If Txt_CodProducto.Text.Length = 0 Then
+        If Txt_CodProducto.Text = "Codigo Producto" Then
             MsgBox("Ingrese el codigo del producto a buscar")
         Else
             If IsNumeric(Txt_CodProducto.Text) Then
@@ -87,7 +138,7 @@ Public Class Inventario
 
 
 
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
         Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
         Dim da As New SqlDataAdapter
@@ -95,14 +146,14 @@ Public Class Inventario
         da = New SqlDataAdapter(comando, conexion)
         da.Fill(dt)
 
-        If Txt_CodProducto.Text.Length = 0 Then
+        If Txt_CodProducto.Text = "Codigo Producto" Then
             MsgBox("Ingrese el codigo del producto a Actualizar")
         Else
             If IsNumeric(Txt_CodProducto.Text) Then
                 Try
                     If dt.Rows.Count <> 0 Then
                         MsgBox("Su actualización se ha realizado correctamente")
-                        Me.InventarioTableAdapter.Actualizar_Almacen(Txt_CodProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text, Txt_CodProducto.Text)
+                        Me.InventarioTableAdapter.Actualizar_Almacen(Txt_CodProducto.Text, Txt_NombreProducto.Text, Numero_CompraComboBox.Text, Txt_Precio_Venta.Text, Txt_CantidadProducto.Text, Txt_CodProducto.Text)
                         Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
                         LimpiarCampos()
                     Else
@@ -115,43 +166,10 @@ Public Class Inventario
         End If
     End Sub
 
-    Private Sub Btn_Borrar_Click(sender As Object, e As EventArgs) Handles Btn_Borrar.Click
-        Me.InventarioTableAdapter.Borrar_Almacen(Txt_CodProducto.Text)
-        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
-        MsgBox("Su Eliminación se ha realizado correctamente")
-        LimpiarCampos()
-
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
-        conexion.Open()
-        Dim comando As String = "select * from Inventario Where Codigo_Producto = '" & Txt_CodProducto.Text & "'"
-        Dim da As New SqlDataAdapter
-        Dim dt As New DataTable
-        da = New SqlDataAdapter(comando, conexion)
-        da.Fill(dt)
-
-        If Txt_CodProducto.Text.Length = 0 Then
-            MsgBox("Ingrese el codigo del producto a borrar")
-        Else
-            If IsNumeric(Txt_CodProducto.Text) Then
-                Try
-                    If dt.Rows.Count <> 0 Then
-
-                    Else
-                        MsgBox("El codigo de producto ingresado no existe")
-                        LimpiarCampos()
-                    End If
-                Catch ex As Exception
-                End Try
-            End If
-        End If
-
-    End Sub
 
 
 
-    Private Sub Txt_CodProducto_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Txt_CodProducto.KeyPress
-        SoloNumeros(e)
-    End Sub
+
 
     Private Sub Numero_CompraComboBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Numero_CompraComboBox.KeyPress
         InhCombobox(e)
@@ -167,6 +185,8 @@ Public Class Inventario
         Numero_CompraComboBox.Text = InventarioDataGridView.CurrentRow.Cells.Item(1).Value.ToString
         Txt_Precio_Venta.Text = InventarioDataGridView.CurrentRow.Cells.Item(2).Value.ToString
         Txt_CantidadProducto.Text = InventarioDataGridView.CurrentRow.Cells.Item(3).Value.ToString
+        TxtColorBlack()
+        OcultarLabels()
     End Sub
 
 
@@ -175,4 +195,95 @@ Public Class Inventario
         LimpiarCampos()
     End Sub
 
+
+    'PlaceHolder Textbox CODIGO
+    Private Sub Txt_CodProducto_TextChanged(sender As Object, e As EventArgs) Handles Txt_CodProducto.TextChanged
+
+        With Txt_CodProducto
+            If .Text = "" Then
+                .Text = "Codigo Producto"
+                .ForeColor = Color.Gray
+            End If
+
+            If .TextLength > 15 Then
+                If StrReverse(StrReverse(.Text).Remove(15)) = "Codigo Producto" Then
+                    .Text = .Text.Remove(.TextLength - 15)
+                    .ForeColor = Color.Black
+                    .SelectionStart = .TextLength
+                    .ScrollToCaret()
+                End If
+            End If
+        End With
+    End Sub
+
+    Private Sub Txt_CodProducto_MouseDown(sender As Object, e As MouseEventArgs) Handles Txt_CodProducto.MouseDown
+        With Txt_CodProducto
+            If .Text = "Codigo Producto" And .ForeColor = Color.Gray Then
+                .SelectionStart = .TextLength
+                .SelectionLength = 0
+                .SelectionStart = 0
+                .ScrollToCaret()
+            End If
+        End With
+
+    End Sub
+
+    Private Sub Txt_CodProducto_MouseMove(sender As Object, e As MouseEventArgs) Handles Txt_CodProducto.MouseMove
+        With Txt_CodProducto
+            If .Text = "Codigo Producto" And .ForeColor = Color.Gray Then
+                .Select(0, 0)
+            End If
+        End With
+
+    End Sub
+
+    Private Sub Numero_CompraComboBox_KeyPress_1(sender As Object, e As KeyPressEventArgs) Handles Numero_CompraComboBox.KeyPress
+        InhCombobox(e)
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Productos.Show()
+    End Sub
+
+    Private Sub Numero_CompraComboBox_Leave(sender As Object, e As EventArgs) Handles Numero_CompraComboBox.Leave
+
+        If Numero_CompraComboBox.Text = "Seleccione el Numero de compra..." Then
+            Validación.SetHighlightColor(Numero_CompraComboBox, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            Lbl_MsjNumcompra.Text = "       Campo Vacio"
+            Lbl_MsjNumcompra.Visible = True
+        Else
+            Lbl_MsjNumcompra.Visible = False
+            Validación.SetHighlightColor(Numero_CompraComboBox, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+            Dim Compra As Double = Txt_Precio_Compra.Text
+            Txt_Precio_Venta.Text = FormatNumber((Compra * 0.15 + Compra), 2)
+        End If
+
+    End Sub
+
+    Private Sub Txt_CodProducto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_CodProducto.KeyPress
+        SoloNumeros(e)
+        If Txt_CodProducto.Text = "Codigo Producto" Then
+            Txt_CodProducto.MaxLength = 16
+        Else
+            Txt_CodProducto.MaxLength = 15
+            If Txt_CodProducto.TextLength >= 15 Then
+                MsgBox("Limite de caracteres alcanzado")
+            End If
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        ComprasExistentes.Show()
+    End Sub
+
+    Private Sub Txt_CodProducto_Leave(sender As Object, e As EventArgs) Handles Txt_CodProducto.Leave
+        If Txt_CodProducto.Text = "Codigo Producto" Then
+            Validación.SetHighlightColor(Txt_CodProducto, DevComponents.DotNetBar.Validator.eHighlightColor.Red)
+            Lbl_MsjCodigo.Text = "       Campo Vacio"
+            Lbl_MsjCodigo.Visible = True
+        Else
+            Validación.SetHighlightColor(Txt_CodProducto, DevComponents.DotNetBar.Validator.eHighlightColor.None)
+            Lbl_MsjCodigo.Visible = False
+        End If
+    End Sub
 End Class
