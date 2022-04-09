@@ -1,0 +1,33 @@
+Imports System.Data.OleDb
+Imports System.Data
+Imports System.Data.SqlClient
+Public Class Productos
+    Public conexion As SqlConnection
+    'Public conexion As OleDbConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS;Initial Catalog=Agrocomercial AVA;Integrated Security=True")
+
+
+    Private Sub Productos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+
+    End Sub
+
+
+
+    Private Sub Txt_NomProducto_TextChanged(sender As Object, e As EventArgs) Handles Txt_NomProducto.TextChanged
+        BusquedaDin(Txt_NomProducto.Text, ProductosDG)
+    End Sub
+
+
+
+    Private Sub ProductosDG_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles ProductosDG.CellDoubleClick
+
+        Inventario.Txt_CodProducto.Text = ProductosDG.CurrentRow.Cells.Item(0).Value.ToString
+        Inventario.Txt_CodProducto.Text = "Hola"
+        Inventario.Label1.Text = "HOLAAA"
+        'Me.Close()
+        'Inventario.TxtColorBlack()
+        'Inventario.OcultarLabels()
+    End Sub
+
+End Class
