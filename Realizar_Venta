@@ -1,0 +1,131 @@
+Imports System.Data.SqlClient
+Public Class Realizar_Venta
+
+    Public conexion As SqlConnection
+    Private Sub Txt_Efectivo_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Txt_Efectivo.KeyPress
+        NumerosyDecimal(Txt_Efectivo, e)
+    End Sub
+
+    Private Sub Btn_Aceptar_Click(sender As Object, e As EventArgs) Handles Btn_Aceptar.Click
+        If Txt_IdFactura.Text <> "" Then
+            Factura.IdFactura.Text = Txt_IdFactura.Text
+            Factura.IdFactura.Text = Me.Txt_IdFactura.Text
+            Factura.Show()
+        End If
+    End Sub
+
+    Sub limpiarCampos()
+        Txt_Codigo.Text = ""
+        Cmb_NombreProd.Text = ""
+        Txt_Precio.Text = ""
+        Cantidad_ND.Value = 0
+    End Sub
+    Private Sub Realizar_Venta_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Detalle_Venta' Puede moverla o quitarla según sea necesario.
+        Me.Detalle_VentaTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Detalle_Venta)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Inventario' Puede moverla o quitarla según sea necesario.
+        Me.InventarioTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Inventario)
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Ventas' Puede moverla o quitarla según sea necesario.
+        Me.VentasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Ventas)
+        Me.VentasTableAdapter.Ordenar_Desc(Me.Agrocomercial_AVADataSet.Ventas)
+        limpiarCampos()
+    End Sub
+
+    Private Sub Ordenar_DescToolStripButton_Click(sender As Object, e As EventArgs)
+        Try
+            Me.VentasTableAdapter.Ordenar_Desc(Me.Agrocomercial_AVADataSet.Ventas)
+        Catch ex As System.Exception
+            System.Windows.Forms.MessageBox.Show(ex.Message)
+        End Try
+
+    End Sub
+
+    Private Sub Ordenar_DescToolStripButton_Click_1(sender As Object, e As EventArgs)
+        Try
+            Me.VentasTableAdapter.Ordenar_Desc(Me.Agrocomercial_AVADataSet.Ventas)
+        Catch ex As System.Exception
+            System.Windows.Forms.MessageBox.Show(ex.Message)
+        End Try
+
+    End Sub
+
+
+
+
+    Private Sub Txt_Efectivo_TextChanged(sender As Object, e As EventArgs) Handles Txt_Efectivo.TextChanged
+        If Txt_Efectivo.Text <> "" And Txt_Total.Text <> "" Then
+            'calcular el cambio
+            Dim Efectivo As Double = Val(Txt_Efectivo.Text)
+            Txt_Cambio.Text = Efectivo - Txt_Total.Text
+        End If
+    End Sub
+
+    Private Sub Cantidad_ND_ValueChanged(sender As Object, e As EventArgs) Handles Cantidad_ND.ValueChanged
+        If Cantidad_ND.Value <> 0 Then
+
+            'Al agregar la cantidad autimaticamente se generaran los calculos'
+            Dim precio As Double = Val(Txt_Precio.Text)
+            Dim cantidad As Integer = Val(Cantidad_ND.Value.ToString)
+            Dim impuesto As Double = 0.15
+
+            Txt_Total.Text = precio * cantidad
+            Txt_Isv.Text = Txt_Total.Text * impuesto
+            Txt_Subtotal.Text = Txt_Total.Text - Txt_Isv.Text
+
+        Else
+            Txt_Total.Clear()
+            Txt_Isv.Clear()
+            Txt_Subtotal.Clear()
+
+        End If
+    End Sub
+
+
+    Private Sub DGV_Ventas_Click(sender As Object, e As EventArgs) Handles DGV_Ventas.Click
+
+        If DGV_Ventas.Rows.Count > 0 Then
+            'Agregar datos del datagridview a los textbox
+            Txt_Codigo.Text = DGV_Ventas.CurrentRow.Cells.Item(0).ToString
+            Cmb_NombreProd.Text = DGV_Ventas.CurrentRow.Cells.Item(1).ToString
+            Txt_Precio.Text = DGV_Ventas.CurrentRow.Cells.Item(2).ToString
+            Cantidad_ND.Value = DGV_Ventas.CurrentRow.Cells.Item(3).ToString
+        Else
+            MsgBox("El datagridview esta vacio, no puedes selecionar ningun dato", MsgBoxStyle.Critical, "Error")
+        End If
+
+    End Sub
+    Private Sub Cmb_NombreProd_Leave(sender As Object, e As EventArgs) Handles Cmb_NombreProd.Leave
+        ComprasNombre(Cmb_NombreProd)
+    End Sub
+
+    Private Sub Cantidad_ND_Leave(sender As Object, e As EventArgs) Handles Cantidad_ND.Leave
+        If Txt_Codigo.Text = "" Or Cmb_NombreProd.Text = "" Or Txt_Precio.Text = "" Or Cantidad_ND.Value = 0 Then
+
+        Else
+            'Agregar al datagridview la información '
+            Dim TotalParcial As Double
+            TotalParcial = (Txt_Precio.Text * Cantidad_ND.Value)
+
+            DGV_Ventas.Rows.Add(Txt_Codigo.Text, Cmb_NombreProd.Text, Txt_Precio.Text, Cantidad_ND.Value, TotalParcial)
+            limpiarCampos()
+
+
+            ' Agregar a detalle de ventas cada producto
+            Me.Detalle_VentaTableAdapter.Insertar_VentaDetalle(Txt_IdFactura.Text, Txt_Codigo.Text, Cantidad_ND.Value, TotalParcial)
+        End If
+    End Sub
+
+    Private Sub Btn_Elminar_Click(sender As Object, e As EventArgs) Handles Btn_Elminar.Click
+        If DGV_Ventas.Rows.Count > 0 Then
+            Me.Detalle_VentaTableAdapter.Eliminar_VentaDetalle(Txt_Codigo.Text)
+            Dim filaS As Integer = DGV_Ventas.CurrentRow.Index
+
+
+            DGV_Ventas.Rows.Remove(DGV_Ventas.Rows(filaS))
+            limpiarCampos()
+
+        Else
+            MsgBox("Debes Seleccionar el dato a eliminar", MsgBoxStyle.Information, "Información")
+        End If
+    End Sub
+End Class
