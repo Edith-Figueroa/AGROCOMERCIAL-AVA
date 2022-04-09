@@ -1,0 +1,11 @@
+Public Class ComprasExistentes
+    Private Sub ComprasExistentes_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: esta línea de código carga datos en la tabla 'Agrocomercial_AVADataSet.Compras' Puede moverla o quitarla según sea necesario.
+        Me.ComprasTableAdapter.Fill(Me.Agrocomercial_AVADataSet.Compras)
+
+    End Sub
+
+    Private Sub Txt_NomProducto_TextChanged(sender As Object, e As EventArgs) Handles Txt_NomProducto.TextChanged
+        BusquedaDinCompras(Txt_NomProducto.Text, ProductosDG)
+    End Sub
+End Class
