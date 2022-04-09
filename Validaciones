@@ -1,13 +1,39 @@
 Imports System.Data.Sql
 Imports System.Data.SqlClient
+
+
 Module Validaciones
+    Public dat As DataTable
     Public conexion As SqlConnection
     Public enunciado As SqlCommand
     Public respuesta As SqlDataReader
 
+    Public Sub BusquedaDin(ByVal Nom As String, ByVal Dg As DataGridView)
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As New SqlDataAdapter
+        comando = New SqlDataAdapter("select * from Inventario Where Nombre_Producto like'" & Nom + "%" & "'", conexion)
+        dat = New DataTable
+        comando.Fill(dat)
+        Dg.DataSource = dat
+
+
+    End Sub
+
+    Public Sub BusquedaDinCompras(ByVal Nom As String, ByVal Dg As DataGridView)
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+        Dim comando As New SqlDataAdapter
+        comando = New SqlDataAdapter("select * from Compras Where Nombre_Producto like'" & Nom + "%" & "'", conexion)
+        dat = New DataTable
+        comando.Fill(dat)
+        Dg.DataSource = dat
+
+
+    End Sub
     Function ConsultarTipoUsuario(ByVal nombreUsuario As String) As Integer
 
-        conexion = New SqlConnection("Data Source=DESKTOP-OM7MBFK\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
         conexion.Open()
 
         Dim resultado As Integer
@@ -30,7 +56,14 @@ Module Validaciones
     Function JefeInventario()
         Menú.Btn_Proveedores.Visible = False
         Menú.Btn_Empleados.Visible = False
-        Menú.Inf_Efectivo.Visible = False
+        Menú.Show()
+    End Function
+
+    Function Cajero()
+        Menú.Btn_Inf_Ventas.Visible = True
+        Menú.Btn_Des_Inventario.Visible = False
+        Menú.Btn_Proveedores.Visible = False
+        Menú.Btn_Empleados.Visible = False
         Menú.Show()
     End Function
 
@@ -57,6 +90,15 @@ Module Validaciones
         End If
     End Sub
 
+    Sub Precios(ByRef e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsNumber(e.KeyChar) Or Char.IsControl(e.KeyChar) Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Solo se puede ingresar valores de tipo número", MsgBoxStyle.Exclamation, "Ingreso de Número")
+        End If
+    End Sub
+
     'Inhabilitar los combobox para que no permita agregar texto
     Sub InhCombobox(ByRef e As System.Windows.Forms.KeyPressEventArgs)
         If Char.IsDigit(e.KeyChar) Then
@@ -70,5 +112,23 @@ Module Validaciones
             MsgBox("solo se aceptan opciones dentro de la lista")
         End If
     End Sub
-
+    Sub Espacios(Txt As TextBox)
+        Txt.Text = LTrim(Txt.Text)
+        Txt.Text = RTrim(Txt.Text)
+    End Sub
+    Public Sub NumerosyDecimal(ByVal CajaTexto As Windows.Forms.TextBox, ByVal e As System.Windows.Forms.KeyPressEventArgs)
+        If Char.IsDigit(e.KeyChar) Then
+            e.Handled = False
+        ElseIf Char.IsControl(e.KeyChar) Then
+            e.Handled = False
+        ElseIf e.KeyChar = "." And Not CajaTexto.Text.IndexOf(".") Then
+            MsgBox("Solo se puede ingresar un punto en su número decimal", MsgBoxStyle.Exclamation, "Ingreso de Número")
+            e.Handled = True
+        ElseIf e.KeyChar = "." Then
+            e.Handled = False
+        Else
+            e.Handled = True
+            MsgBox("Solo se puede ingresar valores de tipo número", MsgBoxStyle.Exclamation, "Ingreso de Número")
+        End If
+    End Sub
 End Module
