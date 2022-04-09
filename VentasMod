@@ -1,0 +1,27 @@
+Imports System.Data.Sql
+Imports System.Data.SqlClient
+
+Module VentasR
+
+    Public conexion As SqlConnection
+    Public enunciado As SqlCommand
+    Public respuesta As SqlDataReader
+    Sub ComprasNombre(ByVal Nom As ComboBox)
+        conexion = New SqlConnection("Data Source=DESKTOP-18G5VAI\SQLEXPRESS ;Initial Catalog=Agrocomercial AVA ;Integrated Security=True")
+        conexion.Open()
+
+        'Asignamos los valores de la base de datos al textbox.
+        Dim comando As String = "Select * from Inventario where Nombre_Producto = '" & Nom.Text & "'"
+        Dim da As New SqlDataAdapter
+        Dim dt As New DataTable
+        da = New SqlDataAdapter(comando, conexion)
+        da.Fill(dt)
+
+        If dt.Rows.Count <> 0 Then
+
+        Else
+            MsgBox("Debes agregar un dato del combobox")
+            Nom.Text = ""
+        End If
+    End Sub
+End Module
